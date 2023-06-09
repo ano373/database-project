@@ -22,7 +22,7 @@ public class memberDATA {
 
     public memberDATA(int companyId, String userType, String firstName, String lastName, String email,
                   String password, String sex, String country, String city, LocalDate birthday,
-                  int phoneNumber, byte[] profilePic, String position) {
+                  int phoneNumber, byte[] profilePic, String position,int salary) {
         this.companyId = companyId;
         this.userType = userType;
         this.firstName = firstName;
@@ -36,6 +36,7 @@ public class memberDATA {
         this.phoneNumber = phoneNumber;
         this.profilePic = profilePic;
         this.position = position;
+        this.salary = salary;
     }
 
 
