@@ -198,7 +198,7 @@ public class HelloController implements Initializable {
 
 
     public void close() {
-        System.exit(0);
+         System.exit(0);
     }
 
     public void switchForm(ActionEvent event) {
