@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +21,8 @@ public class HelloApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
 
-        scene.getStylesheets().add("jobopening_v1companydashboarddesign.css");
+        File cssFile = new File("E:/1- College/2___2nd term/db_project/JobOpening_V1/src/main/java/com/example/jobopening_v1/companydashboarddesign.css");
+        scene.getStylesheets().add(cssFile.toURI().toURL().toExternalForm());
 
         stage.setTitle("Jobs");
         stage.setScene(scene);

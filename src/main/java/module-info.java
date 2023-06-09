@@ -9,6 +9,7 @@ module com.example.jobopening {
     requires org.kordamp.ikonli.javafx;
     requires eu.hansolo.tilesfx;
     requires java.sql;
+    requires fontawesomefx;
 
     opens com.example.jobopening_v1 to javafx.fxml;
     exports com.example.jobopening_v1;

@@ -78,3 +78,11 @@
     -fx-text-fill: #fff;
     -fx-font-family: "Arial";
 }
+
+.nav-btn:hover {
+    -fx-background-color: #1e88e5;
+}
+
+.nav-btn:pressed {
+    -fx-background-color: #1e88e580;
+}
