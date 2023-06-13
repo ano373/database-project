@@ -98,7 +98,7 @@
          <center>
             <AnchorPane fx:id="centerpanel" prefHeight="583.0" prefWidth="884.0" BorderPane.alignment="CENTER">
                <children>
-                  <AnchorPane fx:id="jobopening_form" layoutY="283.0" visible="false">
+                  <AnchorPane fx:id="jobopening_form" layoutY="283.0">
                      <children>
                         <AnchorPane layoutX="1.0" layoutY="-282.0" prefHeight="563.0" prefWidth="873.0" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
                            <children>
@@ -107,7 +107,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="opening_job_title_tf" layoutX="92.0" layoutY="331.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
+                              <TextField fx:id="opening_job_title_tf" layoutX="92.0" layoutY="332.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
                               <Label layoutX="34.0" layoutY="393.0" text="Job_Type ">
                                  <font>
                                     <Font size="14.0" />
@@ -130,53 +130,57 @@
                                  </font>
                               </Label>
                               <TextArea fx:id="opening_job_description_ta" layoutX="413.0" layoutY="347.0" prefHeight="131.0" prefWidth="366.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
-                              <ComboBox fx:id="opening_job_type_combobox" accessibleRole="IMAGE_VIEW" layoutX="97.0" layoutY="391.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
+                              <ComboBox fx:id="opening_job_type_combobox" accessibleRole="IMAGE_VIEW" layoutX="97.0" layoutY="391.0" onAction="#JobTypesList" prefWidth="150.0" promptText="choose" styleClass="textfield" />
                               <DatePicker fx:id="opening_date_date" layoutX="97.0" layoutY="497.0" prefHeight="30.0" prefWidth="156.0" promptText="date" styleClass="textfield" />
-                              <Button fx:id="opening_update_btn" layoutX="552.0" layoutY="507.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Update">
+                              <Button fx:id="opening_update_btn" layoutX="552.0" layoutY="507.0" mnemonicParsing="false" onAction="#updateSelectedJobOpening" prefHeight="41.0" prefWidth="74.0" text="Update">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_add_btn" layoutX="654.0" layoutY="507.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Add">
+                              <Button fx:id="opening_add_btn" layoutX="654.0" layoutY="507.0" mnemonicParsing="false" onAction="#ADD_JobOpening" prefHeight="41.0" prefWidth="74.0" text="Add">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_clear_btn" layoutX="350.0" layoutY="506.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Clear">
+                              <Button fx:id="opening_clear_btn" layoutX="338.0" layoutY="506.0" mnemonicParsing="false" onAction="#ResetFields_JobOpeing" prefHeight="41.0" prefWidth="74.0" text="Clear">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_delete_btn" layoutX="451.0" layoutY="507.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="74.0" text="Delete">
+                              <Button fx:id="opening_delete_btn" layoutX="451.0" layoutY="507.0" mnemonicParsing="false" onAction="#deleteJobOpening" prefHeight="41.0" prefWidth="74.0" text="Delete">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <TableView fx:id="opening_table" prefHeight="279.0" prefWidth="875.0" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
+                              <TableView fx:id="opening_table" onMouseClicked="#JobOpeningSelect" prefHeight="279.0" prefWidth="875.0" snapToPixel="false" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
                                 <columns>
-                                  <TableColumn fx:id="job_opening_id_col" prefWidth="111.19998168945312" text="Job_Opening_ID" />
-                                  <TableColumn fx:id="company_id_col" prefWidth="119.20001220703125" text="Company_ID" />
-                                    <TableColumn fx:id="job_title_col" prefWidth="85.60003662109375" text="Job_Tilte" />
-                                    <TableColumn fx:id="job_description_col" prefWidth="170.39996337890625" text="[Job_Description]" />
-                                    <TableColumn fx:id="job_type_col" minWidth="0.0" prefWidth="87.2000732421875" text="Job_Type" />
-                                    <TableColumn fx:id="salary_col" prefWidth="87.2000732421875" text="Salary" />
-                                    <TableColumn fx:id="deadline_col" prefWidth="209.60003662109375" text="Deadline" />
+                                  <TableColumn fx:id="job_opening_id_col" prefWidth="98.39999389648438" text="Job_Opening_ID" />
+                                  <TableColumn fx:id="company_id_col" prefWidth="82.4000244140625" text="Company_ID" />
+                                    <TableColumn fx:id="job_title_col" prefWidth="71.199951171875" text="Job_Tilte" />
+                                    <TableColumn fx:id="job_description_col" prefWidth="332.8000793457031" text="                       Job_Description" />
+                                    <TableColumn fx:id="job_type_col" minWidth="0.0" prefWidth="92.0" text="Job_Type" />
+                                    <TableColumn fx:id="salary_col" prefWidth="99.199951171875" text="Salary" />
+                                    <TableColumn fx:id="deadline_col" prefWidth="101.60003662109375" text="Deadline" />
                                 </columns>
                                  <styleClass>
                                     <String fx:value="shadow" />

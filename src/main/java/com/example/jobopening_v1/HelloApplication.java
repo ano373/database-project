@@ -25,7 +25,7 @@ public class HelloApplication extends Application {
         scene.getStylesheets().add(cssFile.toURI().toURL().toExternalForm());
 
         stage.setTitle("Jobs");
-         stage.setScene(scene);
+        stage.setScene(scene);
 
 
 
