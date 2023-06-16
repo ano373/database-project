@@ -63,7 +63,7 @@ public class SQLServerConnection {
 
         return connection;
     }
-    public static ResultSet DoQuery(String query, char type ) throws SQLException {
+    public static ResultSet DoQuery(String query, char type) throws SQLException {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -71,28 +71,26 @@ public class SQLServerConnection {
         try {
             connection = SQLServerConnection.startConnection();
             statement = connection.prepareStatement(query);
-            switch (Character.toLowerCase(type)) {
-                case 's' -> resultSet = statement.executeQuery();
-                case 'd', 'u', 'i' -> statement.executeUpdate();
-                default -> throw new IllegalArgumentException("Invalid query type: " + type);
-            }
 
+            switch (Character.toLowerCase(type)) {
+                case 's':
+                    resultSet = statement.executeQuery();
+                    break;
+                case 'd':
+                case 'u':
+                case 'i':
+                    statement.executeUpdate();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid query type: " + type);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
-                connection.close();
-            }
         }
 
         return resultSet;
     }
+
 
     public static void closeConnection() {
         try {

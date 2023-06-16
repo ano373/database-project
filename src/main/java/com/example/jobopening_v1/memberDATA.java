@@ -9,9 +9,11 @@ public class memberDATA {
     private String userType;
     private String firstName;
     private String lastName;
+
+    private String FullName;
     private String email;
     private String password;
-    private String sex;
+    private final String sex;
     private String country;
     private String city;
     private LocalDate birthday;
@@ -38,46 +40,77 @@ public class memberDATA {
         this.position = position;
         this.salary = salary;
     }
+    // no profile pic
+    public memberDATA(int companyId, String userType, String firstName, String lastName, String email,
+                      String password, String sex, String country, String city, LocalDate birthday,
+                      int phoneNumber, String position,int salary) {
+        this.companyId = companyId;
+        this.userType = userType;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.sex = sex;
+        this.country = country;
+        this.city = city;
+        this.birthday = birthday;
+        this.phoneNumber = phoneNumber;
+        this.position = position;
+        this.salary = salary;
+    }
+
+    public memberDATA(int id,String firstName, String lastName , String email, String sex, String city,
+                      int phoneNumber, String position) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.sex = sex;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
+        this.position = position;
+    }
 
 
     public int getId() {
         return id;
     }
-
-    // Getter for First Name
     public String getFirstName() {
         return firstName;
     }
 
-    // Getter for Last Name
+    public String getFullName() {
+        return firstName + ' ' + lastName;
+    }
     public String getLastName() {
         return lastName;
     }
-
-    // Getter for Email
     public String getEmail() {
         return email;
     }
-
-    // Getter for Phone Number
     public int getPhoneNumber() {
         return phoneNumber;
     }
-
-    // Getter for User Type
     public String getUserType() {
         return userType;
     }
-
-    // Getter for Position
     public String getPosition() {
         return position;
     }
+    public String getCity(){
+        return city;
+    }
 
-    // Getter for Salary (assuming it's a property of Member)
+    public String getSex(){ return sex;}
     public double getSalary() {
-
         return salary;
+    }
+
+    public Integer getCompanyIDForEmployer() {
+        if ("employer".equalsIgnoreCase(userType)) {
+            return companyId;
+        }
+        return null;
     }
 
 

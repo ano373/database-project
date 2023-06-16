@@ -15,7 +15,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -30,16 +33,22 @@ import javafx.stage.StageStyle;
 public class HelloController implements Initializable {
 
     private Connection connect;
-
-
-    public Connection getConnect() {
-        return connect;
-    }
-
     private PreparedStatement prepare;
     private ResultSet result;
     private Statement stat;
+    private String loginEmail;
+    private String loginPassword;
 
+
+    private void login_Data(){
+      //  loginEmail ;
+
+    }
+
+//    private int login_company_id(){
+//
+//
+//    }
 
     // Employees Section
     @FXML
@@ -48,21 +57,21 @@ public class HelloController implements Initializable {
     private AnchorPane employees_form;
 
     @FXML
-    private TableView<?> emp_table;
+    private TableView<memberDATA> emp_table;
     @FXML
-    private TableColumn<?, ?> emp_id_col;
+    private TableColumn<memberDATA, Integer> emp_id_col;
     @FXML
-    private TableColumn<?, ?> emp_name_col;
+    private TableColumn<memberDATA, String> emp_name_col;
     @FXML
-    private TableColumn<?, ?> emp_position_col;
+    private TableColumn<memberDATA, String> emp_position_col;
     @FXML
-    private TableColumn<?, ?> emp_email_col;
+    private TableColumn<memberDATA, String> emp_email_col;
     @FXML
-    private TableColumn<?, ?> emp_phonenumber_col;
+    private TableColumn<memberDATA, Integer> emp_phonenumber_col;
     @FXML
-    private TableColumn<?, ?> emp_city_col;
+    private TableColumn<memberDATA, String> emp_city_col;
     @FXML
-    private TableColumn<?, ?> emp_sex_col;
+    private TableColumn<memberDATA, String> emp_sex_col;
 
     @FXML
     private Button emp_update_btn;
@@ -70,12 +79,12 @@ public class HelloController implements Initializable {
     private Button emp_clear_btn;
     @FXML
     private AnchorPane emp_details_panel;
-
-    @FXML
-    private TextField emp_id_tf;
     @FXML
     private ComboBox<?> user_type_combobox;
-
+    @FXML
+    private  TextField position_tf;
+    @FXML
+    private  TextField salary_tf;
     @FXML
     private Label firstname_label;
     @FXML
@@ -83,7 +92,10 @@ public class HelloController implements Initializable {
     @FXML
     private Label email_label;
     @FXML
+    private Label empid_label;
+    @FXML
     private Label phonenumber_label;
+
 
 
     // Job Openings Section
@@ -122,10 +134,11 @@ public class HelloController implements Initializable {
 
     @FXML
     private TextField opening_job_title_tf;
+
     @FXML
     private TextArea opening_job_description_ta;
     @FXML
-    private ComboBox<?> opening_job_type_combobox;
+    private ComboBox<String> opening_job_type_combobox;
     @FXML
     private TextField opening_salary_tf;
     @FXML
@@ -133,13 +146,34 @@ public class HelloController implements Initializable {
 
     // Applications Section
     @FXML
-    private Button applications_btn;
-
+    private Button app_Update_Btn;
     @FXML
-    private AnchorPane applications_form;
-
+    private Button app_ViewProfile_Btn;
     @FXML
-    private TableView<?> applications_table;
+    private Button app_ViewResume_Btn;
+    @FXML
+    private ComboBox<String> app_Status_combobox;
+    @FXML
+    private TableView<ApplicationsDATA> applications_table;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> App_Status_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_City_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_CurrentCompany_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_CurrentPostion_Col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_Email_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, Integer> app_ID_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_JobTitle_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, String> app_Name_col;
+    @FXML
+    private TableColumn<ApplicationsDATA, Integer> app_PhoneNumber_col;
+
 
     // side panel  Sections
     @FXML
@@ -148,6 +182,10 @@ public class HelloController implements Initializable {
     private AnchorPane applications_control;
     @FXML
     private AnchorPane emp_form;
+    @FXML
+    private Button applications_btn;
+    @FXML
+    private AnchorPane applications_form;
     @FXML
     private AnchorPane interviews_form;
     @FXML
@@ -162,6 +200,7 @@ public class HelloController implements Initializable {
     private Button interviews_btn;
     @FXML
     private Button signout_btn;
+
 
 
     JobOpeningsDATA JobOpeningsList;
@@ -245,9 +284,36 @@ public class HelloController implements Initializable {
 
     }
 
+    // employee form functions
+    public ObservableList<memberDATA> list_EmployeeData() throws SQLException {
+        ObservableList<memberDATA> listData = FXCollections.observableArrayList();
+        String query = "SELECT ID,First_Name, Last_Name, Email, Sex, City, Phone_Number, Postion FROM Member";
+        connect = SQLServerConnection.startConnection();
+        try {
+            prepare = connect.prepareStatement(query);
+            result = prepare.executeQuery();
+            memberDATA memberD;
+            while (result.next()) {
+                memberD = new memberDATA(
+                        result.getInt("ID"),
+                        result.getString("First_Name"),
+                        result.getString("Last_Name"),
+                        result.getString("Email"),
+                        result.getString("Sex"),
+                        result.getString("City"),
+                        result.getInt("Phone_Number"),
+                        result.getString("Postion")
+                );
+                listData.add(memberD);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listData;
+    }
+
 
     private String[] JobTypesList = {"part-time", "full-time"};
-
     public void JobTypesList() {
         List<String> listJobType = new ArrayList<>();
 
@@ -257,6 +323,17 @@ public class HelloController implements Initializable {
 
         ObservableList listData = FXCollections.observableArrayList(listJobType);
         opening_job_type_combobox.setItems(listData);
+    }
+    private String[] UserTypeList = {"Employee", "Employer"};
+    public void UserTypesList() {
+        List<String> listUserType = new ArrayList<>();
+
+        for (String data : UserTypeList) {
+            listUserType.add(data);
+        }
+
+        ObservableList listData = FXCollections.observableArrayList(listUserType);
+        user_type_combobox.setItems(listData);
     }
 
 
@@ -294,6 +371,75 @@ public class HelloController implements Initializable {
         opening_table.setItems(addJobOpeningsList);
 
     }
+    private ObservableList<memberDATA> addEmployeeList;
+    public void ShowList_EmployeeData() throws SQLException {
+        addEmployeeList = list_EmployeeData();
+        loadEmployeeData();
+        emp_table.setItems(addEmployeeList);
+
+    }
+
+
+    //application form functions
+
+
+    public void loadEmployeeData() {
+        Map<TableColumn<memberDATA, ?>, String> columnMappings = new HashMap<>();
+        columnMappings.put(emp_id_col, "id");
+        columnMappings.put(emp_name_col, "FullName");
+        columnMappings.put(emp_email_col, "email");
+        columnMappings.put(emp_sex_col, "sex");
+        columnMappings.put(emp_city_col, "city");
+        columnMappings.put(emp_phonenumber_col, "phoneNumber");
+        columnMappings.put(emp_position_col, "position");
+
+        for (TableColumn<memberDATA, ?> column : columnMappings.keySet()) {
+            column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
+        }
+    }
+
+    private int SelectedEmployeeID(){
+        int num = emp_table.getSelectionModel().getSelectedIndex();
+
+        if ((num - 1) < -1) {
+            return num;
+        }
+
+        memberDATA memberD = emp_table.getSelectionModel().getSelectedItem();
+        TableColumn<memberDATA, Integer> firstColumn = (TableColumn<memberDATA, Integer>) emp_table.getColumns().get(0);
+        int ID = firstColumn.getCellData(num);
+
+        return ID;
+    }
+
+    @FXML
+    public int SelectEmployee() throws SQLException {
+        memberDATA memberD = emp_table.getSelectionModel().getSelectedItem();
+        int num = emp_table.getSelectionModel().getSelectedIndex();
+
+        if ((num - 1) < -1) {
+            return num;
+        }
+
+        empid_label.setText(String.valueOf(memberD.getId()));
+        firstname_label.setText(memberD.getFirstName());
+        lastname_label.setText(memberD.getLastName());
+        email_label.setText(memberD.getEmail());
+        phonenumber_label.setText(String.valueOf(memberD.getPhoneNumber()));
+        position_tf.setText(memberD.getPosition());
+        String query = "SELECT Salary FROM Member WHERE ID = " + SelectedEmployeeID();
+        ResultSet resultSet = SQLServerConnection.DoQuery(query, Select);
+
+        String salary = null;
+        while (resultSet.next()) {
+            salary = String.valueOf(resultSet.getInt("Salary"));
+        }
+        salary_tf.setText(salary);
+        resultSet.close();
+        return num;
+
+    }
+
 
     public void loadJobOpeningsData() {
         Map<TableColumn<JobOpeningsDATA, ?>, String> columnMappings = new HashMap<>();
@@ -309,8 +455,8 @@ public class HelloController implements Initializable {
             column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
         }
     }
-
     public int JobOpeningSelect() {
+
         JobOpeningsDATA jobOpeningD = opening_table.getSelectionModel().getSelectedItem();
         int num = opening_table.getSelectionModel().getSelectedIndex();
 
@@ -322,13 +468,16 @@ public class HelloController implements Initializable {
         opening_salary_tf.setText(String.valueOf(jobOpeningD.getSalary()));
         opening_job_description_ta.setText(jobOpeningD.getJobDescription());
         opening_date_date.setValue(jobOpeningD.getDeadline().toLocalDate());
-        //      opening_job_type_combobox.getSelectionModel().select(opening_job_type_combobox.getItems().indexOf(jobOpeningD.getJobType()));
+        String jobType = jobOpeningD.getJobType();
+
+        //opening_job_type_combobox.setValue(opening_job_type_combobox.getItems().get());
         TableColumn<JobOpeningsDATA, Integer> firstColumn = (TableColumn<JobOpeningsDATA, Integer>) opening_table.getColumns().get(0);
         int JobOpeningID = firstColumn.getCellData(num);
 
         return JobOpeningID;
 
     }
+
 
     private void showAlert(Alert.AlertType type, String title, String headerText, String contentText) {
         Alert alert = new Alert(type);
@@ -350,6 +499,37 @@ public class HelloController implements Initializable {
              return true;
 
     }
+
+    private boolean AlertCheckFieldsEmployee() {
+        if (salary_tf.getText().isEmpty()
+                || position_tf.getText().isEmpty()
+                || user_type_combobox.getSelectionModel().isEmpty())
+        {
+            return false;
+        }
+        return true;
+
+    }
+    private void updateEmployee() {
+        String query = "UPDATE Member SET User_Type = ?, Postion = ?,Salary = ? WHERE ID = ?";
+
+        try {
+            Connection connection = SQLServerConnection.startConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1,  (String)user_type_combobox.getSelectionModel().getSelectedItem());
+            statement.setString(2, position_tf.getText());
+            statement.setString(3, salary_tf.getText());
+            statement.setInt(4,SelectedEmployeeID());
+            statement.executeUpdate();
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public void insertJobOpening(int companyId, String jobTitle, String jobDescription, String jobType, String salary, LocalDate deadline) {
         String query = "INSERT INTO JobOpening (Company_ID, Job_Tilte, Job_Description, Job_Type, Salary, Deadline) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -391,14 +571,75 @@ public class HelloController implements Initializable {
             statement.setInt(4, Integer.parseInt(opening_salary_tf.getText()));
             statement.setDate(5, java.sql.Date.valueOf(opening_date_date.getValue()));
             statement.setInt(6, JobOpeningSelect());
-           // SQLServerConnection.DoQuery(query,Update);
             statement.executeUpdate();
-
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void updateSelectedEmployee() {
+        try {
+            connect = SQLServerConnection.startConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        memberDATA selectedItem = emp_table.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+            try {
+                if (AlertCheckFieldsEmployee()){
+                    showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Successfully Updated!");
+                    updateEmployee();
+                    ShowList_EmployeeData();
+                    ResetFields_Employee();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error Message", null, "You must fill in all fields");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
+        }
+    }
+
+
+    public void uploadImageToDatabase(String imagePath, int applicationID) {
+        try {
+            // Read the image file into bytes
+            File imageFile = new File(imagePath);
+            byte[] imageData = Files.readAllBytes(imageFile.toPath());
+
+            // Prepare the SQL query with parameters for the image data and application ID
+            String query = "UPDATE Application SET Resume = ? WHERE ID = ?";
+
+            // Create a connection to the database
+            Connection connection = SQLServerConnection.startConnection();
+
+            // Create a prepared statement with the query
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            // Set the parameter for the image data
+            statement.setBytes(1, imageData);
+
+            // Set the parameter for the application ID
+            statement.setInt(2, applicationID);
+
+            // Execute the query to update the image
+            statement.executeUpdate();
+
+            // Close the statement and connection
+            statement.close();
+            connection.close();
+
+            System.out.println("Image uploaded successfully.");
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public void ADD_JobOpening() {
@@ -466,11 +707,25 @@ public class HelloController implements Initializable {
 
     }
 
+    public void ResetFields_Employee() {
+        String orignalvalue = "select employee";
+        String Orignalvalue2 = "empty";
+        empid_label.setText(orignalvalue);
+        firstname_label.setText(orignalvalue);
+        lastname_label.setText(orignalvalue);
+        email_label.setText(Orignalvalue2);
+        phonenumber_label.setText(Orignalvalue2);
+        position_tf.setText("");
+        salary_tf.setText("");
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             JobTypesList();
+            UserTypesList();
             ShowList_JobOpeningData();
+            ShowList_EmployeeData();
 
 
         } catch (SQLException e) {
