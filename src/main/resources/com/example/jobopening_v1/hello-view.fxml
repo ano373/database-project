@@ -130,7 +130,7 @@
                                  </font>
                               </Label>
                               <TextArea fx:id="opening_job_description_ta" layoutX="413.0" layoutY="347.0" prefHeight="131.0" prefWidth="366.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
-                              <ComboBox fx:id="opening_job_type_combobox" accessibleRole="IMAGE_VIEW" layoutX="97.0" layoutY="391.0" onAction="#JobTypesList" prefWidth="150.0" promptText="choose" styleClass="textfield" />
+                              <ComboBox fx:id="opening_job_type_combobox" accessibleRole="IMAGE_VIEW" layoutX="97.0" layoutY="391.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
                               <DatePicker fx:id="opening_date_date" layoutX="97.0" layoutY="497.0" prefHeight="30.0" prefWidth="156.0" promptText="date" styleClass="textfield" />
                               <Button fx:id="opening_update_btn" layoutX="552.0" layoutY="507.0" mnemonicParsing="false" onAction="#updateSelectedJobOpening" prefHeight="41.0" prefWidth="74.0" text="Update">
                                  <styleClass>
@@ -197,7 +197,7 @@
                   </AnchorPane>
                   <AnchorPane fx:id="applications_form" prefHeight="564.8" prefWidth="884.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <TableView fx:id="applications_table" layoutX="4.0" layoutY="9.0" prefHeight="378.0" prefWidth="870.0">
+                        <TableView fx:id="applications_table" layoutX="4.0" layoutY="9.0" onMouseClicked="#ApplictionsViewSelect" prefHeight="378.0" prefWidth="870.0">
                           <columns>
                               <TableColumn fx:id="app_ID_col" minWidth="0.0" prefWidth="111.99998474121094" sortable="false" text="Applicant ID" />
                             <TableColumn fx:id="app_JobTitle_col" prefWidth="98.39999389648438" sortable="false" text="Job_Title" />
@@ -216,19 +216,21 @@
                         <AnchorPane fx:id="applications_control" layoutX="10.0" layoutY="389.0" prefHeight="166.0" prefWidth="862.0">
                            <children>
                               <ComboBox fx:id="app_Status_combobox" layoutX="669.0" layoutY="58.0" prefHeight="37.0" prefWidth="164.0" promptText="Change Status" styleClass="textfield" />
-                              <Button fx:id="app_Update_Btn" layoutX="517.0" layoutY="51.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="80.0" text="Update">
+                              <Button fx:id="app_Update_Btn" layoutX="517.0" layoutY="51.0" mnemonicParsing="false" onAction="#updateSelectedApplication" prefHeight="50.0" prefWidth="80.0" text="Update">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="app_ViewProfile_Btn" layoutX="98.0" layoutY="51.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
+                              <Button fx:id="app_ViewProfile_Btn" layoutX="98.0" layoutY="51.0" mnemonicParsing="false" onAction="#openApplicantDetails" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />
@@ -238,6 +240,7 @@
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
+                                    <String fx:value="nav-btn" />
                                  </styleClass>
                                  <font>
                                     <Font size="13.0" />

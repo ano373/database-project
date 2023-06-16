@@ -28,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.StageStyle;
+import javafx.util.Pair;
 
 
 public class HelloController implements Initializable {
@@ -80,7 +81,7 @@ public class HelloController implements Initializable {
     @FXML
     private AnchorPane emp_details_panel;
     @FXML
-    private ComboBox<?> user_type_combobox;
+    private ComboBox<String> user_type_combobox;
     @FXML
     private  TextField position_tf;
     @FXML
@@ -154,25 +155,25 @@ public class HelloController implements Initializable {
     @FXML
     private ComboBox<String> app_Status_combobox;
     @FXML
-    private TableView<ApplicationsDATA> applications_table;
+    private TableView<ApplicationsViewDATA> applications_table;
     @FXML
-    private TableColumn<ApplicationsDATA, String> App_Status_col;
+    private TableColumn<ApplicationsViewDATA, String> App_Status_col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_City_col;
+    private TableColumn<ApplicationsViewDATA, String> app_City_col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_CurrentCompany_col;
+    private TableColumn<ApplicationsViewDATA, String> app_CurrentCompany_col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_CurrentPostion_Col;
+    private TableColumn<ApplicationsViewDATA, String> app_CurrentPostion_Col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_Email_col;
+    private TableColumn<ApplicationsViewDATA, String> app_Email_col;
     @FXML
-    private TableColumn<ApplicationsDATA, Integer> app_ID_col;
+    private TableColumn<ApplicationsViewDATA, Integer> app_ID_col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_JobTitle_col;
+    private TableColumn<ApplicationsViewDATA, String> app_JobTitle_col;
     @FXML
-    private TableColumn<ApplicationsDATA, String> app_Name_col;
+    private TableColumn<ApplicationsViewDATA, String> app_Name_col;
     @FXML
-    private TableColumn<ApplicationsDATA, Integer> app_PhoneNumber_col;
+    private TableColumn<ApplicationsViewDATA, Integer> app_PhoneNumber_col;
 
 
     // side panel  Sections
@@ -207,15 +208,20 @@ public class HelloController implements Initializable {
 
     private double x = 0;
     private double y = 0;
+
+
     final char Update = 'U';
     final char Delete = 'D';
     final char Select = 'S';
     final char Insert = 'I';
 
+    private String[] JobTypesList = {"part-time", "full-time"};
+    private String[] UserTypeList = {"Employee", "Employer"};
+    private  String[] ApplicationStatusList = {"Rejected", "Pending","Selected"};
+
     public void close() {
         System.exit(0);
     }
-
     public void switchForm(ActionEvent event) {
         Object source = event.getSource();
 
@@ -240,7 +246,6 @@ public class HelloController implements Initializable {
 
         }
     }
-
     public void logout() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -283,6 +288,19 @@ public class HelloController implements Initializable {
         }
 
     }
+    @FXML
+    private void populateComboBox(ComboBox<String> comboBox, String[] data) {
+        List<String> listData = new ArrayList<>();
+
+        for (String item : data) {
+            listData.add(item);
+        }
+
+        ObservableList<String> observableList = FXCollections.observableArrayList(listData);
+        comboBox.setItems(observableList);
+    }
+
+
 
     // employee form functions
     public ObservableList<memberDATA> list_EmployeeData() throws SQLException {
@@ -312,31 +330,6 @@ public class HelloController implements Initializable {
         return listData;
     }
 
-
-    private String[] JobTypesList = {"part-time", "full-time"};
-    public void JobTypesList() {
-        List<String> listJobType = new ArrayList<>();
-
-        for (String data : JobTypesList) {
-            listJobType.add(data);
-        }
-
-        ObservableList listData = FXCollections.observableArrayList(listJobType);
-        opening_job_type_combobox.setItems(listData);
-    }
-    private String[] UserTypeList = {"Employee", "Employer"};
-    public void UserTypesList() {
-        List<String> listUserType = new ArrayList<>();
-
-        for (String data : UserTypeList) {
-            listUserType.add(data);
-        }
-
-        ObservableList listData = FXCollections.observableArrayList(listUserType);
-        user_type_combobox.setItems(listData);
-    }
-
-
     public ObservableList<JobOpeningsDATA> list_JobOpeningData() throws SQLException {
         ObservableList<JobOpeningsDATA> listData = FXCollections.observableArrayList();
         String query = "SELECT * FROM JobOpening";
@@ -362,9 +355,7 @@ public class HelloController implements Initializable {
         }
         return listData;
     }
-
     private ObservableList<JobOpeningsDATA> addJobOpeningsList;
-
     public void ShowList_JobOpeningData() throws SQLException {
         addJobOpeningsList = list_JobOpeningData();
         loadJobOpeningsData();
@@ -380,9 +371,195 @@ public class HelloController implements Initializable {
     }
 
 
+
+
     //application form functions
+    public void loadApplicationsData() {
+        Map<TableColumn<ApplicationsViewDATA, ?>, String> columnMappings = new HashMap<>();
+        columnMappings.put(app_ID_col, "memberId");
+        columnMappings.put(app_JobTitle_col, "jobTitle");
+        columnMappings.put(app_Name_col, "name");
+        columnMappings.put(app_Email_col, "email");
+        columnMappings.put(app_City_col, "city");
+        columnMappings.put(app_PhoneNumber_col, "phoneNumber");
+        columnMappings.put(app_CurrentPostion_Col, "currentPosition");
+        columnMappings.put(app_CurrentCompany_col, "currentCompany");
+        columnMappings.put(App_Status_col, "applicationStatus");
+
+        for (TableColumn<ApplicationsViewDATA, ?> column : columnMappings.keySet()) {
+            column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
+        }
+    }
+    public ObservableList<ApplicationsViewDATA> list_ApplicationsViewData() throws SQLException {
+        ObservableList<ApplicationsViewDATA> listData = FXCollections.observableArrayList();
+        String query = "SELECT\n" +
+                "    M.ID AS MemberID,\n" +
+                "    J.Job_Tilte AS Job_Title,\n" +
+                "    CONCAT(M.First_Name, ' ', M.Last_Name) AS Name,\n" +
+                "    M.Email,\n" +
+                "    M.City,\n" +
+                "    M.Phone_Number,\n" +
+                "    M.Postion AS Current_Position,\n" +
+                "    C.Company_Name AS Current_Company,\n" +
+                "    A.Application_Status\n" +
+                "FROM\n" +
+                "    Member M\n" +
+                "     JOIN Application A ON M.ID = A.ID\n" +
+                "     JOIN JobOpening J ON A.Job_Opening_ID = J.Job_Opening_ID\n" +
+                "    LEFT JOIN Company C ON M.Company_ID = C.Company_ID;\n" +
+                "   ";
+        connect = SQLServerConnection.startConnection();
+        try {
+            prepare = connect.prepareStatement(query);
+            result = prepare.executeQuery();
+            ApplicationsViewDATA ApplicationsViewD;
+            while (result.next()) {
+                ApplicationsViewD = new ApplicationsViewDATA(
+                        result.getInt("MemberID"),
+                        result.getString("Job_Title"),
+                        result.getString("Name"),
+                        result.getString("Email"),
+                        result.getString("City"),
+                        result.getString("Phone_Number"),
+                        result.getString("Current_Position"),
+                        result.getString("Current_Company"),
+                        result.getString("Application_Status")
+                );
+                listData.add(ApplicationsViewD);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listData;
+    }
+    private ObservableList<ApplicationsViewDATA> addlist_ApplicationsViewList;
+    public void ShowList_ApplicationsViewData() throws SQLException {
+        addlist_ApplicationsViewList = list_ApplicationsViewData();
+        loadApplicationsData();
+        applications_table.setItems(addlist_ApplicationsViewList);
+
+    }
+    @FXML
+    public  Pair<Integer, Integer> ApplictionsViewSelect() throws SQLException {
+
+        ApplicationsViewDATA ApplicationsViewD = applications_table.getSelectionModel().getSelectedItem();
+        int num = applications_table.getSelectionModel().getSelectedIndex();
+
+        if ((num - 1) < -1) {
+            return new Pair<>(num, num);
+        }
+    //    app_Status_combobox.setValue(ApplicationsViewD.getApplicationStatus());
+        TableColumn<ApplicationsViewDATA, Integer> firstColumn = (TableColumn<ApplicationsViewDATA, Integer>) applications_table.getColumns().get(0);
+        TableColumn<ApplicationsViewDATA, Integer> secondColumn = (TableColumn<ApplicationsViewDATA, Integer>) applications_table.getColumns().get(1);
+
+        int MemberID = firstColumn.getCellData(num);
+        String Jobtitle = String.valueOf(secondColumn.getCellData(num));
+        String query = "SELECT Job_Opening_ID FROM JobOpening WHERE Job_Tilte = '" + Jobtitle + "'";
+        ResultSet result = SQLServerConnection.DoQuery(query, Select);
+        int jobOpeningID = 0;
+        if (result.next()) {
+            jobOpeningID = result.getInt("Job_Opening_ID");
+        }
+        System.out.println("Member ID: " + MemberID);
+        System.out.println("Job Opening ID: " + jobOpeningID);
+        return new Pair<>(MemberID, jobOpeningID);
+    }
+
+    private void updateApplicationStatus() {
+        Pair<Integer, Integer> resultPair = null;
+        try {
+            resultPair = ApplictionsViewSelect();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        int memberID = resultPair.getKey();
+        int jobOpeningID = resultPair.getValue();
+
+        String query = "UPDATE Application SET Application_Status = ? WHERE ID = ? AND Job_Opening_ID = ?";
+
+        try {
+            connect = SQLServerConnection.startConnection();
+            PreparedStatement statement = connect.prepareStatement(query);
+            System.out.println(app_Status_combobox.getSelectionModel().getSelectedItem());
+            statement.setString(1,app_Status_combobox.getSelectionModel().getSelectedItem());
+
+            statement.setInt(2, memberID);
+            statement.setInt(3, jobOpeningID);
+            statement.executeUpdate();
+            statement.close();
+            connect.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    private void openApplicantDetails(ActionEvent event) {
+        // Get the selected applicant ID from the application table
+        ApplicationsViewDATA selectedApplicant = applications_table.getSelectionModel().getSelectedItem();
+
+        if(selectedApplicant!=null) {
+            int applicantID = selectedApplicant.getMemberId();
+        //    System.out.println(applicantID);
+
+            try {
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ApplicantDetails.fxml"));
+                Parent root = loader.load();
 
 
+                ApplicantDetailsController applicantDetailsController = loader.getController();
+
+
+                try {
+                    applicantDetailsController.setApplicantID(applicantID);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                Stage detailsStage = new Stage();
+                detailsStage.setScene(new Scene(root));
+                detailsStage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            showAlert(Alert.AlertType.ERROR, "Error Message", null, "No Applicant is selected");
+
+
+
+
+    }
+
+
+
+    public void updateSelectedApplication() throws SQLException {
+            connect = SQLServerConnection.startConnection();
+
+        ApplicationsViewDATA selectedItem = applications_table.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+            showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Successfully Updated!");
+            updateApplicationStatus();
+            ShowList_ApplicationsViewData();
+            app_Status_combobox.setValue("");
+
+        } else
+            showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
+
+    }
+
+
+
+
+
+
+
+
+
+    //..............................................................................
+    //employee form functions
     public void loadEmployeeData() {
         Map<TableColumn<memberDATA, ?>, String> columnMappings = new HashMap<>();
         columnMappings.put(emp_id_col, "id");
@@ -427,13 +604,18 @@ public class HelloController implements Initializable {
         email_label.setText(memberD.getEmail());
         phonenumber_label.setText(String.valueOf(memberD.getPhoneNumber()));
         position_tf.setText(memberD.getPosition());
-        String query = "SELECT Salary FROM Member WHERE ID = " + SelectedEmployeeID();
+
+        String query = "SELECT Salary,User_Type FROM Member WHERE ID = " + SelectedEmployeeID();
         ResultSet resultSet = SQLServerConnection.DoQuery(query, Select);
 
         String salary = null;
+        String Usertype = null;
         while (resultSet.next()) {
             salary = String.valueOf(resultSet.getInt("Salary"));
+            Usertype =  resultSet.getString("User_Type");
         }
+
+        user_type_combobox.setValue(Usertype);
         salary_tf.setText(salary);
         resultSet.close();
         return num;
@@ -470,13 +652,15 @@ public class HelloController implements Initializable {
         opening_date_date.setValue(jobOpeningD.getDeadline().toLocalDate());
         String jobType = jobOpeningD.getJobType();
 
-        //opening_job_type_combobox.setValue(opening_job_type_combobox.getItems().get());
+        opening_job_type_combobox.setValue(jobOpeningD.getJobType());
         TableColumn<JobOpeningsDATA, Integer> firstColumn = (TableColumn<JobOpeningsDATA, Integer>) opening_table.getColumns().get(0);
         int JobOpeningID = firstColumn.getCellData(num);
 
         return JobOpeningID;
 
     }
+
+
 
 
     private void showAlert(Alert.AlertType type, String title, String headerText, String contentText) {
@@ -528,8 +712,6 @@ public class HelloController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
-
     public void insertJobOpening(int companyId, String jobTitle, String jobDescription, String jobType, String salary, LocalDate deadline) {
         String query = "INSERT INTO JobOpening (Company_ID, Job_Tilte, Job_Description, Job_Type, Salary, Deadline) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -578,7 +760,6 @@ public class HelloController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
     public void updateSelectedEmployee() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -605,8 +786,6 @@ public class HelloController implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
         }
     }
-
-
     public void uploadImageToDatabase(String imagePath, int applicationID) {
         try {
             // Read the image file into bytes
@@ -640,8 +819,6 @@ public class HelloController implements Initializable {
             e.printStackTrace();
         }
     }
-
-
     public void ADD_JobOpening() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -666,9 +843,6 @@ public class HelloController implements Initializable {
             e.printStackTrace();
         }
     }
-
-
-
     public void updateSelectedJobOpening() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -695,8 +869,6 @@ public class HelloController implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
         }
     }
-
-
     public void ResetFields_JobOpeing() {
         opening_job_title_tf.setText("");
         opening_salary_tf.setText("");
@@ -706,7 +878,6 @@ public class HelloController implements Initializable {
 
 
     }
-
     public void ResetFields_Employee() {
         String orignalvalue = "select employee";
         String Orignalvalue2 = "empty";
@@ -722,10 +893,13 @@ public class HelloController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            JobTypesList();
-            UserTypesList();
+            populateComboBox(opening_job_type_combobox, JobTypesList);
+            populateComboBox(user_type_combobox, UserTypeList);
+            populateComboBox(app_Status_combobox,ApplicationStatusList);
             ShowList_JobOpeningData();
             ShowList_EmployeeData();
+            ShowList_ApplicationsViewData();
+
 
 
         } catch (SQLException e) {

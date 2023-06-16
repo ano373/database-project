@@ -1,8 +1,6 @@
 package com.example.jobopening_v1;
 
-import java.time.LocalDate;
-
-public class ApplicationsDATA {
+public class ApplicationsViewDATA {
         private int memberId;
         private String jobTitle;
         private String name;
@@ -13,7 +11,18 @@ public class ApplicationsDATA {
         private String currentCompany;
         private String applicationStatus;
 
-        // Getter methods
+        public ApplicationsViewDATA(int memberId, String jobTitle, String name, String email, String city, String phoneNumber, String currentPosition, String currentCompany, String applicationStatus) {
+            this.memberId = memberId;
+            this.jobTitle = jobTitle;
+            this.name = name;
+            this.email = email;
+            this.city = city;
+            this.phoneNumber = phoneNumber;
+            this.currentPosition = currentPosition;
+            this.currentCompany = currentCompany;
+            this.applicationStatus = applicationStatus;
+        }
+
         public int getMemberId() {
             return memberId;
         }
@@ -50,9 +59,6 @@ public class ApplicationsDATA {
             return applicationStatus;
         }
 
-        // Setter methods
 
-        // ...
-    }
-
+}
 
