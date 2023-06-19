@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -50,6 +51,9 @@ public class HelloController implements Initializable {
 //
 //
 //    }
+
+    @FXML
+    private VBox Vbox_intersets;
 
     // Employees Section
     @FXML
@@ -176,6 +180,46 @@ public class HelloController implements Initializable {
     private TableColumn<ApplicationsViewDATA, Integer> app_PhoneNumber_col;
 
 
+
+    // interview panel section
+    @FXML
+    private ComboBox<String> InterviewStatus_combobox;
+    @FXML
+    private ComboBox<String> InterviewType_combobox;
+    @FXML
+    private Button Interview_Cancel_btn;
+    @FXML
+    private Button Interview_Schedule_btn;
+    @FXML
+    private Button Interview_Update_btn;
+    @FXML
+    private DatePicker Interview_date;
+    @FXML
+    private ComboBox<String> Interviewer_combobox;
+
+    @FXML
+    private TableView<InterviewDATA> Interview_table;
+    @FXML
+    private TableColumn<InterviewDATA, Date> interview_IDate_col;
+    @FXML
+    private TableColumn<InterviewDATA, String> interview_Interviewee_col;
+    @FXML
+    private TableColumn<InterviewDATA, String> interview_Interviewer_col;
+    @FXML
+    private TableColumn<InterviewDATA, Integer> interview_JobOpeningID_col;
+    @FXML
+    private TableColumn<InterviewDATA, String> interview_JobTitle_col;
+    @FXML
+    private TableColumn<InterviewDATA, String> interview_Status_col;
+    @FXML
+    private TableColumn<InterviewDATA, String> interview_Type_col;
+    @FXML
+    private TableColumn<InterviewDATA, Integer> IntervieweeID_col;
+
+
+
+
+
     // side panel  Sections
     @FXML
     private AnchorPane centerpanel;
@@ -217,6 +261,8 @@ public class HelloController implements Initializable {
 
     private String[] JobTypesList = {"part-time", "full-time"};
     private String[] UserTypeList = {"Employee", "Employer"};
+    private  String[] InterviewStatusList = {"Scheduled", "Completed","Cancelled","Accepted"};
+    private String[] InterviewTypeList = {"Phone", "Video", "InPerson"};
     private  String[] ApplicationStatusList = {"Rejected", "Pending","Selected"};
 
     public void close() {
@@ -257,7 +303,7 @@ public class HelloController implements Initializable {
             if (option.get().equals(ButtonType.OK)) {
 
                 signout_btn.getScene().getWindow().hide();
-                Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+                Parent root = FXMLLoader.load(getClass().getResource("SignIN.fxml"));
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
 
@@ -300,6 +346,38 @@ public class HelloController implements Initializable {
         comboBox.setItems(observableList);
     }
 
+    //intersets part
+
+
+public void fillVbox_interset()
+    {
+        List<String> interests = getInterestsFromDatabase();
+        for (String interest : interests) {
+            CheckBox checkBox = new CheckBox(interest);
+            Vbox_intersets.getChildren().add(checkBox);
+        }
+    }
+
+    private List<String> getInterestsFromDatabase() {
+        List<String> interests = new ArrayList<>();
+        try {
+            Connection connection = SQLServerConnection.startConnection();
+            String query = "SELECT Interset_Name FROM Interset";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String interestName = resultSet.getString("Interset_Name");
+                interests.add(interestName);
+            }
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return interests;
+    }
 
 
     // employee form functions
@@ -373,6 +451,237 @@ public class HelloController implements Initializable {
 
 
 
+    //interview form functions
+    public void loadInterviewData() {
+        Map<TableColumn<InterviewDATA, ?>, String> columnMappings = new HashMap<>();
+        columnMappings.put(interview_JobOpeningID_col, "jobOpeningID");
+        columnMappings.put(interview_JobTitle_col, "jobTitle");
+        columnMappings.put(interview_Interviewer_col, "interviewer");
+        columnMappings.put(interview_Interviewee_col, "interviewee");
+        columnMappings.put(interview_Type_col, "interviewType");
+        columnMappings.put(interview_IDate_col, "date");
+        columnMappings.put(interview_Status_col, "interviewStatus");
+        columnMappings.put(IntervieweeID_col,"IntervieweeID");
+
+
+        for (TableColumn<InterviewDATA, ?> column : columnMappings.keySet()) {
+            column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
+        }
+    }
+    public ObservableList<InterviewDATA> list_InterviewData() throws SQLException {
+        ObservableList<InterviewDATA> listData = FXCollections.observableArrayList();
+        String query = "SELECT\n" +
+                "    J.Job_Opening_ID,\n" +
+                "    J.Job_Tilte AS Job_Title,\n" +
+                "    CONCAT(E.First_Name, ' ', E.Last_Name) AS Interviewer,\n" +
+                "    CONCAT(JS.First_Name, ' ', JS.Last_Name) AS Interviewee,\n" +
+                "    I.Interview_Type,\n" +
+                "    I.Date,\n" +
+                "    I.Interview_Status,\n" +
+                "\tJS.ID AS IntervieweeID\n" +
+                "FROM\n" +
+                "    JobOpening J\n" +
+                "    JOIN Interview I ON J.Job_Opening_ID = I.Job_Opening_ID\n" +
+                "    JOIN Member E ON I.Employer = E.ID\n" +
+                "    JOIN Member JS ON I.Job_Seeker = JS.ID\n" +
+                "WHERE\n" +
+                "    I.Interview_Status = 'Scheduled'\n" +
+                "    AND J.Company_ID = " + UserData.COMPANYID;
+        connect = SQLServerConnection.startConnection();
+        try {
+            prepare = connect.prepareStatement(query);
+            result = prepare.executeQuery();
+            InterviewDATA InterviewD;
+            while (result.next()) {
+                InterviewD = new InterviewDATA(
+                        result.getInt("Job_Opening_ID"),
+                        result.getString("Job_Title"),
+                        result.getString("Interviewer"),
+                        result.getString("Interviewee"),
+                        result.getString("Interview_Type"),
+                        result.getDate("Date"),
+                        result.getString("Interview_Status"),
+                        result.getInt("IntervieweeID")
+                );
+                listData.add(InterviewD);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listData;
+    }
+    private ObservableList<InterviewDATA> addlist_InterviewList;
+    public void ShowList_InterviewViewData() throws SQLException {
+        addlist_InterviewList = list_InterviewData();
+        loadInterviewData();
+        Interview_table.setItems(addlist_InterviewList);
+
+    }
+    private void createScheduledInterview(int memberID, int jobOpeningID) {
+        try {
+            connect = SQLServerConnection.startConnection();
+            String insertQuery = "INSERT INTO Interview (Job_Opening_ID, Employer, Job_Seeker, Interview_Status, Date, Interview_Type) " +
+                    "VALUES (?, ?, ?, 'Scheduled', ?, 'InPerson')";
+            PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
+            insertStatement.setInt(1, jobOpeningID);
+            insertStatement.setInt(2, getEmployerInfo(UserData.COMPANYID).get(0).getKey());
+            insertStatement.setInt(3, memberID);
+            insertStatement.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+            insertStatement.executeUpdate();
+            insertStatement.close();
+
+            connect.close();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Pair<Integer, String>> getEmployerInfo(int companyID) throws SQLException {
+        List<Pair<Integer, String>> employerInfolist = new ArrayList<>();
+        String query = "SELECT ID as EmployerID, Name\n" +
+                "FROM EmployerView\n" +
+                "WHERE Company_ID = " + companyID ;
+
+        ResultSet result =  SQLServerConnection.DoQuery(query,Select);
+
+
+            while (result.next()) {
+                int employerID = result.getInt("EmployerID");
+                String employerName = result.getString("Name");
+                Pair<Integer, String> employerInfo = new Pair<>(employerID, employerName);
+                employerInfolist.add(employerInfo);
+            }
+
+        result.close();
+
+
+        return employerInfolist;
+    }
+    private String[] getEmployerNames(int companyID) throws SQLException {
+        List<Pair<Integer, String>> employerInfoList = getEmployerInfo(companyID);
+        String[] employerNames = new String[employerInfoList.size()];
+
+        for (int i = 0; i < employerInfoList.size(); i++) {
+            String employerName = employerInfoList.get(i).getValue();
+            employerNames[i] = employerName;
+        }
+
+        return employerNames;
+    }
+    @FXML
+    public int SelectInterview() throws SQLException {
+        InterviewDATA InterviewD = Interview_table.getSelectionModel().getSelectedItem();
+        int num = Interview_table.getSelectionModel().getSelectedIndex();
+
+        if ((num - 1) < -1) {
+            return num;
+        }
+
+        Interviewer_combobox.setValue(InterviewD.getInterviewer());
+        InterviewStatus_combobox.setValue(InterviewD.getInterviewStatus());
+       InterviewType_combobox.setValue(InterviewD.getInterviewType());
+       Interview_date.setValue(InterviewD.getDate().toLocalDate());
+        return num;
+
+    }
+    private void updateInterview() throws SQLException {
+        int InterviewerID = 0;
+        String query = "UPDATE Interview\n" +
+                "SET\n" +
+                "    Employer = ?,\n" +
+                "    Interview_Status = ?,\n" +
+                "    Interview_Type = ?,\n" +
+                "    Date = ?\n" +
+                "WHERE\n" +
+                "    Job_Opening_ID = ?\n" +
+                "    AND Job_Seeker = ?;\n";
+
+        String query2 = "SELECT ID as EmployerID\n" +
+                "FROM EmployerView\n" +
+                "WHERE NAME = ? AND Company_ID = ?";
+
+        // Prepare the query parameters
+        String selectedInterviewer = Interviewer_combobox.getSelectionModel().getSelectedItem();
+        int companyID = UserData.COMPANYID;
+
+
+            Connection connection = SQLServerConnection.startConnection();
+            PreparedStatement statement = connection.prepareStatement(query2);
+            statement.setString(1, selectedInterviewer);
+            statement.setInt(2, companyID);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                InterviewerID = result.getInt("EmployerID");
+            }
+
+            result.close();
+            statement.close();
+
+
+
+        TableColumn<InterviewDATA, ?> IntervieweeIDcolumn = Interview_table.getColumns().get(7);
+        TableColumn<InterviewDATA, ?> JobIDcolumn = Interview_table.getColumns().get(0);
+
+
+
+        InterviewDATA selectedItem = Interview_table.getSelectionModel().getSelectedItem();
+        int JobIDselected = (int) JobIDcolumn.getCellObservableValue(selectedItem).getValue();
+
+        InterviewDATA selectedItem2 = Interview_table.getSelectionModel().getSelectedItem();
+        int IntervieweeIDselected = (int) IntervieweeIDcolumn.getCellObservableValue(selectedItem2).getValue();
+
+        try {
+            Connection connect = SQLServerConnection.startConnection();
+            PreparedStatement stat = connect.prepareStatement(query);
+            stat.setInt(1,  InterviewerID);
+            stat.setString(2,  InterviewStatus_combobox.getSelectionModel().getSelectedItem());
+            stat.setString(3, InterviewType_combobox.getSelectionModel().getSelectedItem());
+            stat.setDate(4,java.sql.Date.valueOf(Interview_date.getValue()));
+           stat.setInt(5, JobIDselected);
+            stat.setInt(6, IntervieweeIDselected);
+            stat.executeUpdate();
+            stat.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateSelectedInterview() throws SQLException {
+        connect = SQLServerConnection.startConnection();
+
+        InterviewDATA selectedItem = Interview_table.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+            showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Successfully Updated!");
+            updateInterview();
+            ShowList_InterviewViewData();
+            emptyInterviewFields();
+
+
+        } else
+            showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
+
+    }
+
+
+
+private void emptyInterviewFields()
+{
+    Interviewer_combobox.setValue("");
+    InterviewStatus_combobox.setValue("");
+    InterviewType_combobox.setValue("");
+    Interview_date.setValue(null);
+}
+
+
+
+
+
     //application form functions
     public void loadApplicationsData() {
         Map<TableColumn<ApplicationsViewDATA, ?>, String> columnMappings = new HashMap<>();
@@ -392,7 +701,7 @@ public class HelloController implements Initializable {
     }
     public ObservableList<ApplicationsViewDATA> list_ApplicationsViewData() throws SQLException {
         ObservableList<ApplicationsViewDATA> listData = FXCollections.observableArrayList();
-        String query = "SELECT\n" +
+        String query = "SELECT DISTINCT\n" +
                 "    M.ID AS MemberID,\n" +
                 "    J.Job_Tilte AS Job_Title,\n" +
                 "    CONCAT(M.First_Name, ' ', M.Last_Name) AS Name,\n" +
@@ -476,17 +785,20 @@ public class HelloController implements Initializable {
         int jobOpeningID = resultPair.getValue();
 
         String query = "UPDATE Application SET Application_Status = ? WHERE ID = ? AND Job_Opening_ID = ?";
-
+        String ApplicationStatus = app_Status_combobox.getSelectionModel().getSelectedItem();
         try {
             connect = SQLServerConnection.startConnection();
             PreparedStatement statement = connect.prepareStatement(query);
-            System.out.println(app_Status_combobox.getSelectionModel().getSelectedItem());
-            statement.setString(1,app_Status_combobox.getSelectionModel().getSelectedItem());
+            statement.setString(1,ApplicationStatus);
 
             statement.setInt(2, memberID);
             statement.setInt(3, jobOpeningID);
             statement.executeUpdate();
             statement.close();
+            if (ApplicationStatus.equals("Selected")) {
+                createScheduledInterview(memberID, jobOpeningID);
+            }
+
             connect.close();
 
         } catch (SQLException e) {
@@ -742,7 +1054,9 @@ public class HelloController implements Initializable {
 
     }
     private void updateJobOpening() {
-        String query = "UPDATE JobOpening SET Job_Tilte = ?, Job_Description = ?, Job_Type = ?, Salary = ?, Deadline = ? WHERE Job_Opening_ID = ?";
+        String query = "UPDATE JobOpening SET Job_Tilte = ?," +
+                " Job_Description = ?, Job_Type = ?, Salary = ?," +
+                " Deadline = ? WHERE Job_Opening_ID = ?";
 
         try {
             Connection connection = SQLServerConnection.startConnection();
@@ -896,9 +1210,14 @@ public class HelloController implements Initializable {
             populateComboBox(opening_job_type_combobox, JobTypesList);
             populateComboBox(user_type_combobox, UserTypeList);
             populateComboBox(app_Status_combobox,ApplicationStatusList);
+            populateComboBox(InterviewStatus_combobox,InterviewStatusList);
+            populateComboBox(InterviewType_combobox,InterviewTypeList);
+            populateComboBox(Interviewer_combobox,getEmployerNames(UserData.COMPANYID));
+            fillVbox_interset();
             ShowList_JobOpeningData();
             ShowList_EmployeeData();
             ShowList_ApplicationsViewData();
+            ShowList_InterviewViewData();
 
 
 

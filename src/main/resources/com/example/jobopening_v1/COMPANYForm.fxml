@@ -14,21 +14,22 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.jobopening_v1.HelloController">
    <children>
-      <BorderPane stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
+      <BorderPane stylesheets="@companydashboarddesign.css">
          <top>
-            <AnchorPane fx:id="uppanel" prefHeight="35.0" prefWidth="200.0" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="uppanel" prefHeight="35.0" prefWidth="200.0" stylesheets="@companydashboarddesign.css" BorderPane.alignment="CENTER">
                <children>
                   <Button layoutX="1034.0" layoutY="2.0" mnemonicParsing="false" onAction="#close" textFill="#3e8c64">
                      <graphic>
                         <FontAwesomeIcon glyphName="CLOSE" />
                      </graphic>
                   </Button>
-                  <Button layoutX="6.0" layoutY="-2.0" mnemonicParsing="false" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" text="Button">
+                  <Button layoutX="6.0" layoutY="-2.0" mnemonicParsing="false" stylesheets="@companydashboarddesign.css" text="Button">
                      <graphic>
                         <FontAwesomeIcon />
                      </graphic>
@@ -46,12 +47,12 @@
             </AnchorPane>
          </top>
          <left>
-            <AnchorPane fx:id="sidepanel" prefHeight="565.0" prefWidth="214.0" styleClass="nav-form-aqua-blue" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="sidepanel" prefHeight="565.0" prefWidth="214.0" styleClass="nav-form-aqua-blue" stylesheets="@companydashboarddesign.css" BorderPane.alignment="CENTER">
                <children>
                   <FontAwesomeIcon glyphName="USER" layoutX="70.0" layoutY="153.0" size="7EM" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="166.0" prefHeight="18.0" prefWidth="214.0" text="Welcome" />
                   <Line endX="84.99998474121094" layoutX="107.0" layoutY="206.0" startX="-76.59999084472656" />
-                  <Button fx:id="home_btn" alignment="CENTER_RIGHT" layoutX="30.0" layoutY="218.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="30.0" prefWidth="161.0" styleClass="nav-btn" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" text="    Home" textOverrun="CLIP">
+                  <Button fx:id="home_btn" alignment="CENTER_RIGHT" layoutX="30.0" layoutY="218.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="30.0" prefWidth="161.0" styleClass="nav-btn" stylesheets="@companydashboarddesign.css" text="    Home" textOverrun="CLIP">
                      <graphic>
                         <FontAwesomeIcon glyphName="HOME" size="2EM" text="" />
                      </graphic>
@@ -98,16 +99,16 @@
          <center>
             <AnchorPane fx:id="centerpanel" prefHeight="583.0" prefWidth="884.0" BorderPane.alignment="CENTER">
                <children>
-                  <AnchorPane fx:id="jobopening_form" layoutY="283.0" visible="false">
+                  <AnchorPane fx:id="jobopening_form" layoutY="283.0">
                      <children>
-                        <AnchorPane layoutX="1.0" layoutY="-282.0" prefHeight="563.0" prefWidth="873.0" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
+                        <AnchorPane layoutX="1.0" layoutY="-282.0" prefHeight="563.0" prefWidth="873.0" stylesheets="@companydashboarddesign.css">
                            <children>
                               <Label layoutX="27.0" layoutY="337.0" text="Job_Title ">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="opening_job_title_tf" layoutX="92.0" layoutY="332.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
+                              <TextField fx:id="opening_job_title_tf" layoutX="92.0" layoutY="332.0" styleClass="textfield" stylesheets="@companydashboarddesign.css" />
                               <Label layoutX="34.0" layoutY="393.0" text="Job_Type ">
                                  <font>
                                     <Font size="14.0" />
@@ -118,21 +119,21 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="opening_salary_tf" layoutX="92.0" layoutY="441.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
+                              <TextField fx:id="opening_salary_tf" layoutX="92.0" layoutY="441.0" styleClass="textfield" stylesheets="@companydashboarddesign.css" />
                               <Label layoutX="34.0" layoutY="500.0" text="Deadline ">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="299.0" layoutY="344.0" text="Job_Description ">
+                              <Label layoutX="375.0" layoutY="309.0" text="Job_Description ">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextArea fx:id="opening_job_description_ta" layoutX="413.0" layoutY="347.0" prefHeight="131.0" prefWidth="366.0" styleClass="textfield" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css" />
+                              <TextArea fx:id="opening_job_description_ta" layoutX="480.0" layoutY="309.0" prefHeight="131.0" prefWidth="366.0" styleClass="textfield" stylesheets="@companydashboarddesign.css" />
                               <ComboBox fx:id="opening_job_type_combobox" accessibleRole="IMAGE_VIEW" layoutX="97.0" layoutY="391.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
                               <DatePicker fx:id="opening_date_date" layoutX="97.0" layoutY="497.0" prefHeight="30.0" prefWidth="156.0" promptText="date" styleClass="textfield" />
-                              <Button fx:id="opening_update_btn" layoutX="552.0" layoutY="507.0" mnemonicParsing="false" onAction="#updateSelectedJobOpening" prefHeight="41.0" prefWidth="74.0" text="Update">
+                              <Button fx:id="opening_update_btn" layoutX="620.0" layoutY="476.0" mnemonicParsing="false" onAction="#updateSelectedJobOpening" prefHeight="41.0" prefWidth="74.0" text="Update">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -142,7 +143,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_add_btn" layoutX="654.0" layoutY="507.0" mnemonicParsing="false" onAction="#ADD_JobOpening" prefHeight="41.0" prefWidth="74.0" text="Add">
+                              <Button fx:id="opening_add_btn" layoutX="720.0" layoutY="476.0" mnemonicParsing="false" onAction="#ADD_JobOpening" prefHeight="41.0" prefWidth="74.0" text="Add">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -152,7 +153,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_clear_btn" layoutX="338.0" layoutY="506.0" mnemonicParsing="false" onAction="#ResetFields_JobOpeing" prefHeight="41.0" prefWidth="74.0" text="Clear">
+                              <Button fx:id="opening_clear_btn" layoutX="419.0" layoutY="476.0" mnemonicParsing="false" onAction="#ResetFields_JobOpeing" prefHeight="41.0" prefWidth="74.0" text="Clear">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -162,7 +163,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="opening_delete_btn" layoutX="451.0" layoutY="507.0" mnemonicParsing="false" onAction="#deleteJobOpening" prefHeight="41.0" prefWidth="74.0" text="Delete">
+                              <Button fx:id="opening_delete_btn" layoutX="518.0" layoutY="476.0" mnemonicParsing="false" onAction="#deleteJobOpening" prefHeight="41.0" prefWidth="74.0" text="Delete">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -172,7 +173,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <TableView fx:id="opening_table" onMouseClicked="#JobOpeningSelect" prefHeight="279.0" prefWidth="875.0" snapToPixel="false" stylesheets="@../../../../java/com/example/jobopening_v1/companydashboarddesign.css">
+                              <TableView fx:id="opening_table" onMouseClicked="#JobOpeningSelect" prefHeight="279.0" prefWidth="875.0" snapToPixel="false" stylesheets="@companydashboarddesign.css">
                                 <columns>
                                   <TableColumn fx:id="job_opening_id_col" prefWidth="98.39999389648438" text="Job_Opening_ID" />
                                   <TableColumn fx:id="company_id_col" prefWidth="82.4000244140625" text="Company_ID" />
@@ -187,6 +188,12 @@
                                     <String fx:value="table-column" />
                                  </styleClass>
                               </TableView>
+                              <VBox fx:id="Vbox_intersets" layoutX="265.0" layoutY="330.0" prefHeight="210.0" prefWidth="126.0" />
+                              <Label layoutX="279.0" layoutY="309.0" text="intersets" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Bell MT Bold" size="14.0" />
+                                 </font>
+                              </Label>
                            </children>
                            <styleClass>
                               <String fx:value="shadow" />
@@ -195,7 +202,7 @@
                         </AnchorPane>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="applications_form" prefHeight="564.8" prefWidth="884.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="applications_form" prefHeight="564.8" prefWidth="884.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <TableView fx:id="applications_table" layoutX="4.0" layoutY="9.0" onMouseClicked="#ApplictionsViewSelect" prefHeight="378.0" prefWidth="870.0">
                           <columns>
@@ -252,33 +259,24 @@
                   </AnchorPane>
                   <AnchorPane fx:id="interviews_form" layoutX="-4.0" prefHeight="564.8" prefWidth="884.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <TableView prefHeight="302.0" prefWidth="884.0" AnchorPane.bottomAnchor="263.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TableView fx:id="Interview_table" onMouseClicked="#SelectInterview" prefHeight="302.0" prefWidth="884.0" AnchorPane.bottomAnchor="263.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
-                              <TableColumn prefWidth="75.0" text="Job ID" />
-                            <TableColumn prefWidth="75.0" text="Job Title" />
-                              <TableColumn prefWidth="75.0" text="interviewer" />
-                              <TableColumn prefWidth="75.0" text="interviewee " />
-                              <TableColumn prefWidth="140.0" text="Interview_Type" />
-                              <TableColumn prefWidth="71.20001220703125" text="Date" />
-                            <TableColumn prefWidth="135.20001220703125" text="Interview_Status" />
+                              <TableColumn fx:id="interview_JobOpeningID_col" prefWidth="75.0" text="Job ID" />
+                            <TableColumn fx:id="interview_JobTitle_col" prefWidth="75.0" text="Job Title" />
+                              <TableColumn fx:id="interview_Interviewer_col" prefWidth="75.0" text="interviewer" />
+                              <TableColumn fx:id="interview_Interviewee_col" prefWidth="75.0" text="interviewee " />
+                              <TableColumn fx:id="interview_Type_col" prefWidth="140.0" text="Interview_Type" />
+                              <TableColumn fx:id="interview_IDate_col" prefWidth="71.20001220703125" text="Date" />
+                            <TableColumn fx:id="interview_Status_col" prefWidth="220.800048828125" text="Interview_Status" />
+                              <TableColumn fx:id="IntervieweeID_col" prefWidth="117.5999755859375" text="IntervieweeID" />
                           </columns>
                         </TableView>
                         <AnchorPane layoutY="302.0" prefHeight="261.0" prefWidth="879.0">
                            <children>
                               <Label layoutX="67.0" layoutY="42.0" text="interviewer" />
-                              <TextField layoutX="157.0" layoutY="38.0" styleClass="textfield" />
                               <Label layoutX="46.0" layoutY="152.0" text="Interview Type" />
-                              <ComboBox layoutX="159.0" layoutY="147.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
-                              <Button layoutX="419.0" layoutY="72.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="125.0" text="Cancel Interview">
-                                 <styleClass>
-                                    <String fx:value="nav-form-aqua-blue" />
-                                    <String fx:value="logout" />
-                                 </styleClass>
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </Button>
-                              <Button layoutX="616.0" layoutY="72.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="122.0" text="Update">
+                              <ComboBox fx:id="InterviewType_combobox" layoutX="159.0" layoutY="147.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
+                              <Button fx:id="Interview_Update_btn" layoutX="509.0" layoutY="92.0" mnemonicParsing="false" onAction="#updateSelectedInterview" prefHeight="42.0" prefWidth="122.0" text="Update">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -288,16 +286,10 @@
                                  </font>
                               </Button>
                               <Label layoutX="42.0" layoutY="94.0" text="Interview Status" />
-                              <ComboBox layoutX="157.0" layoutY="89.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
-                              <Button layoutX="497.0" layoutY="140.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="165.0" text="Schedule New Interview">
-                                 <styleClass>
-                                    <String fx:value="nav-form-aqua-blue" />
-                                    <String fx:value="logout" />
-                                 </styleClass>
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </Button>
+                              <ComboBox fx:id="InterviewStatus_combobox" layoutX="157.0" layoutY="89.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
+                              <DatePicker fx:id="Interview_date" layoutX="162.0" layoutY="193.0" prefHeight="26.0" prefWidth="148.0" />
+                              <Label layoutX="81.0" layoutY="198.0" prefHeight="18.0" prefWidth="47.0" text="Date" />
+                              <ComboBox fx:id="Interviewer_combobox" layoutX="157.0" layoutY="48.0" prefWidth="150.0" promptText="choose" styleClass="textfield" />
                            </children>
                         </AnchorPane>
                      </children>
