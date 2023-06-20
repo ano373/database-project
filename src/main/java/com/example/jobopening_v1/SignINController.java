@@ -40,72 +40,86 @@ public class SignINController {
     private double x = 0;
     private double y = 0;
     public void login() throws SQLException {
-        String sql = "SELECT * FROM Member WHERE (User_Type = 'employer') AND Email = ? AND Password = ?";
+        String sql = "SELECT * FROM Member WHERE Email = ? AND Password = ?";
+        conn = SQLServerConnection.startConnection();
 
-        conn=SQLServerConnection.startConnection();
-        try{
-
-            st=conn.prepareStatement(sql);
-            st.setString(1,email.getText());
-            st.setString(2,password.getText());
-            rs=st.executeQuery();
+        try {
+            st = conn.prepareStatement(sql);
+            st.setString(1, email.getText());
+            st.setString(2, password.getText());
+            rs = st.executeQuery();
 
             Alert alert;
 
-            if(email.getText().isEmpty() || password.getText().isEmpty()){
+            if (email.getText().isEmpty() || password.getText().isEmpty()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error Message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please fill all blank fields");
                 alert.showAndWait();
-            }
-            else{
-                if(rs.next()){
-                    UserData.username=rs.getString(4)+ " "+rs.getString(5);
-                    UserData.id=rs.getInt(1);
-                    UserData.email=rs.getString(6);
-                    UserData.COMPANYID = rs.getInt(2);
+            } else {
+                if (rs.next()) {
+                    String User_Type = rs.getString("User_Type");
+                    UserData.username = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                    UserData.id = rs.getInt("ID");
+                    UserData.email = rs.getString("Email");
+                    UserData.COMPANYID = rs.getInt("Company_ID");
 
-                    //System.out.println(UserData.username);
-                    alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("info");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Successfully loged in");
-                    alert.showAndWait();
+                    // Determine the FXML file based on the user type
+                    String fxmlFile = null;
+                    if (User_Type.equals("Employer")) {
+                        fxmlFile = "COMPANYForm.fxml";
+                    } else if (User_Type.equals("employee") || User_Type.equals("JobSeeker")) {
+                        fxmlFile = "EmployeeForm.fxml";
+                    }
 
-                    loginbtn.getScene().getWindow().hide();
-                    Parent root = FXMLLoader.load(getClass().getResource("COMPANYForm.fxml"));
-                    Stage stage = new Stage();
-                    Scene scene = new Scene(root);
-                    root.setOnMousePressed((MouseEvent event) ->{
-                        x = event.getSceneX();
-                        y = event.getSceneY();
-                    });
+                    // Check if fxmlFile is not null before loading the FXML file
+                    if (fxmlFile != null) {
+                        alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("info");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Successfully logged in");
+                        alert.showAndWait();
 
-                    root.setOnMouseDragged((MouseEvent event) ->{
-                        stage.setX(event.getScreenX() - x);
-                        stage.setY(event.getScreenY() - y);
-                    });
+                        loginbtn.getScene().getWindow().hide();
+                        Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
+                        Stage stage = new Stage();
+                        Scene scene = new Scene(root);
+                        root.setOnMousePressed((MouseEvent event) -> {
+                            x = event.getSceneX();
+                            y = event.getSceneY();
+                        });
 
-                    stage.initStyle(StageStyle.TRANSPARENT);
+                        root.setOnMouseDragged((MouseEvent event) -> {
+                            stage.setX(event.getScreenX() - x);
+                            stage.setY(event.getScreenY() - y);
+                        });
 
-
-                    stage.setScene(scene);
-                    stage.show();
-                }
-                else{
+                        stage.initStyle(StageStyle.TRANSPARENT);
+                        stage.setScene(scene);
+                        stage.show();
+                    } else {
+                        // Handle the case when fxmlFile is null
+                        alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error Message");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Unsupported user type");
+                        alert.showAndWait();
+                    }
+                } else {
                     alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error Message");
                     alert.setHeaderText(null);
-                    alert.setContentText("wrong Email or passowrd");
+                    alert.setContentText("Wrong Email or Password");
                     alert.showAndWait();
                 }
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
+
     public void close(){
         System.exit(0);
     }

@@ -29,30 +29,7 @@ public class HelloApplication extends Application {
 
 
 
-//        String insertStatement2 = "INSERT INTO Company (Company_Name, Location, Industry) " +
-//                "VALUES ('XYZ Corporation', 'London', 'Finance')";
-//        conn.executeStatement(insertStatement2);
 
-
-//        PreparedStatement ps = conn.prepareStatement(selectStatement);
-//
-//
-//        ResultSet rs = ps.executeQuery();
-//        String companyName = "";
-//        String industry = "";
-//        if (rs.next()) {
-//            companyName = rs.getString("Company_Name");
-//            industry = rs.getString("Industry");
-//
-//            System.out.println("Company Name: " + companyName);
-//            System.out.println("Industry: " + industry);
-//        } else {
-//            System.out.println("No results found.");
-//        }
-
-// Store the data in variables or use them as needed
-//        System.out.println("Stored Company Name: " + companyName);
-//        System.out.println("Stored Industry: " + industry);
 
 
 

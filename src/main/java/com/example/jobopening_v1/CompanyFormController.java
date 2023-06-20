@@ -12,14 +12,14 @@ import javafx.scene.control.*;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -32,7 +32,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
 
-public class HelloController implements Initializable {
+public class CompanyFormController implements Initializable {
 
     private Connection connect;
     private PreparedStatement prepare;
@@ -42,8 +42,8 @@ public class HelloController implements Initializable {
     private String loginPassword;
 
 
-    private void login_Data(){
-      //  loginEmail ;
+    private void login_Data() {
+        //  loginEmail ;
 
     }
 
@@ -51,6 +51,8 @@ public class HelloController implements Initializable {
 //
 //
 //    }
+    @FXML
+    private ImageView imageview_pan;
 
     @FXML
     private VBox Vbox_intersets;
@@ -87,9 +89,9 @@ public class HelloController implements Initializable {
     @FXML
     private ComboBox<String> user_type_combobox;
     @FXML
-    private  TextField position_tf;
+    private TextField position_tf;
     @FXML
-    private  TextField salary_tf;
+    private TextField salary_tf;
     @FXML
     private Label firstname_label;
     @FXML
@@ -100,7 +102,6 @@ public class HelloController implements Initializable {
     private Label empid_label;
     @FXML
     private Label phonenumber_label;
-
 
 
     // Job Openings Section
@@ -180,7 +181,6 @@ public class HelloController implements Initializable {
     private TableColumn<ApplicationsViewDATA, Integer> app_PhoneNumber_col;
 
 
-
     // interview panel section
     @FXML
     private ComboBox<String> InterviewStatus_combobox;
@@ -217,9 +217,6 @@ public class HelloController implements Initializable {
     private TableColumn<InterviewDATA, Integer> IntervieweeID_col;
 
 
-
-
-
     // side panel  Sections
     @FXML
     private AnchorPane centerpanel;
@@ -247,11 +244,12 @@ public class HelloController implements Initializable {
     private Button signout_btn;
 
 
-
     JobOpeningsDATA JobOpeningsList;
 
     private double x = 0;
     private double y = 0;
+
+
 
 
     final char Update = 'U';
@@ -261,13 +259,14 @@ public class HelloController implements Initializable {
 
     private String[] JobTypesList = {"part-time", "full-time"};
     private String[] UserTypeList = {"Employee", "Employer"};
-    private  String[] InterviewStatusList = {"Scheduled", "Completed","Cancelled","Accepted"};
+    private String[] InterviewStatusList = {"Scheduled", "Completed", "Cancelled", "Accepted"};
     private String[] InterviewTypeList = {"Phone", "Video", "InPerson"};
-    private  String[] ApplicationStatusList = {"Rejected", "Pending","Selected"};
+    private String[] ApplicationStatusList = {"Rejected", "Pending", "Selected"};
 
     public void close() {
         System.exit(0);
     }
+
     public void switchForm(ActionEvent event) {
         Object source = event.getSource();
 
@@ -292,6 +291,7 @@ public class HelloController implements Initializable {
 
         }
     }
+
     public void logout() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -334,6 +334,7 @@ public class HelloController implements Initializable {
         }
 
     }
+
     @FXML
     private void populateComboBox(ComboBox<String> comboBox, String[] data) {
         List<String> listData = new ArrayList<>();
@@ -347,16 +348,14 @@ public class HelloController implements Initializable {
     }
 
     //intersets part
-
-
-public void fillVbox_interset()
-    {
+    public void fillVbox_interset() {
         List<String> interests = getInterestsFromDatabase();
         for (String interest : interests) {
             CheckBox checkBox = new CheckBox(interest);
             Vbox_intersets.getChildren().add(checkBox);
         }
     }
+
 
     private List<String> getInterestsFromDatabase() {
         List<String> interests = new ArrayList<>();
@@ -379,11 +378,104 @@ public void fillVbox_interset()
         return interests;
     }
 
+    private List<String> getInterestsNames(int jobOpeningID) throws SQLException {
+        List<String> interestNames = new ArrayList<>();
+        String query = "SELECT i.Interset_Name " +
+                "FROM Interset i " +
+                "JOIN JobOpeningInterset ji ON i.Interset_ID = ji.Interset_ID " +
+                "WHERE ji.Job_Opening_ID = ?";
+
+        try (PreparedStatement statement = connect.prepareStatement(query)) {
+            statement.setInt(1, jobOpeningID);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String interestName = resultSet.getString("Interset_Name");
+                interestNames.add(interestName);
+            }
+        }
+
+        return interestNames;
+    }
+
+
+
+    private void MapJobOpeningsIntersets(int jobOpeningID) throws SQLException {
+        String deleteQuery = "DELETE FROM JobOpeningInterset WHERE Job_Opening_ID = ?";
+        try (Connection connection = SQLServerConnection.startConnection();
+             PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+            deleteStatement.setInt(1, jobOpeningID);
+            deleteStatement.executeUpdate();
+        }
+        String insertQuery = "INSERT INTO JobOpeningInterset (Interset_ID, Job_Opening_ID) VALUES (?, ?)";
+        try (Connection connection = SQLServerConnection.startConnection();
+             PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+            for (Node node : Vbox_intersets.getChildren()) {
+                if (node instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) node;
+                    if (checkBox.isSelected()) {
+                        String interestName = checkBox.getText();
+                        int interestID = intersetIDsByName(interestName);
+                        insertStatement.setInt(1, interestID);
+                        insertStatement.setInt(2, jobOpeningID);
+                        insertStatement.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    private int SelectedJobOpening(){
+        int num = opening_table.getSelectionModel().getSelectedIndex();
+        int JobOpeningID;
+        if ((num - 1) < -1)
+        {
+            return num;
+        }
+        TableColumn<JobOpeningsDATA, Integer> firstColumn = (TableColumn<JobOpeningsDATA, Integer>) opening_table.getColumns().get(0);
+        JobOpeningID = firstColumn.getCellData(num);
+        return JobOpeningID;
+
+
+    }
+
+    private int intersetIDsByName(String IntersetName) throws SQLException {
+        int IntersertID = 0;
+        String query = "SELECT Interset_ID\n" +
+                "FROM Interset\n" +
+                "WHERE Interset_Name = ?";
+
+        try (Connection connection = SQLServerConnection.startConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, IntersetName);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next())
+                IntersertID = result.getInt("Interset_ID");
+
+            if (IntersertID == 0)
+                showAlert(Alert.AlertType.ERROR, "Error Message", null, "No Interset ID found for this interest name");
+
+            return IntersertID;
+        } catch (SQLException e) {
+            // Handle the exception appropriately
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
 
     // employee form functions
     public ObservableList<memberDATA> list_EmployeeData() throws SQLException {
         ObservableList<memberDATA> listData = FXCollections.observableArrayList();
-        String query = "SELECT ID,First_Name, Last_Name, Email, Sex, City, Phone_Number, Postion FROM Member";
+        String query = "SELECT ID,First_Name, Last_Name, Email, Sex, City, Phone_Number, Postion FROM Member where Company_ID = " +UserData.COMPANYID;
         connect = SQLServerConnection.startConnection();
         try {
             prepare = connect.prepareStatement(query);
@@ -410,7 +502,7 @@ public void fillVbox_interset()
 
     public ObservableList<JobOpeningsDATA> list_JobOpeningData() throws SQLException {
         ObservableList<JobOpeningsDATA> listData = FXCollections.observableArrayList();
-        String query = "SELECT * FROM JobOpening";
+        String query = "SELECT * FROM JobOpening where Company_ID = " + UserData.COMPANYID;
         connect = SQLServerConnection.startConnection();
         try {
             prepare = connect.prepareStatement(query);
@@ -433,22 +525,24 @@ public void fillVbox_interset()
         }
         return listData;
     }
+
     private ObservableList<JobOpeningsDATA> addJobOpeningsList;
+
     public void ShowList_JobOpeningData() throws SQLException {
         addJobOpeningsList = list_JobOpeningData();
         loadJobOpeningsData();
         opening_table.setItems(addJobOpeningsList);
 
     }
+
     private ObservableList<memberDATA> addEmployeeList;
+
     public void ShowList_EmployeeData() throws SQLException {
         addEmployeeList = list_EmployeeData();
         loadEmployeeData();
         emp_table.setItems(addEmployeeList);
 
     }
-
-
 
 
     //interview form functions
@@ -461,13 +555,14 @@ public void fillVbox_interset()
         columnMappings.put(interview_Type_col, "interviewType");
         columnMappings.put(interview_IDate_col, "date");
         columnMappings.put(interview_Status_col, "interviewStatus");
-        columnMappings.put(IntervieweeID_col,"IntervieweeID");
+        columnMappings.put(IntervieweeID_col, "IntervieweeID");
 
 
         for (TableColumn<InterviewDATA, ?> column : columnMappings.keySet()) {
             column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
         }
     }
+
     public ObservableList<InterviewDATA> list_InterviewData() throws SQLException {
         ObservableList<InterviewDATA> listData = FXCollections.observableArrayList();
         String query = "SELECT\n" +
@@ -510,13 +605,16 @@ public void fillVbox_interset()
         }
         return listData;
     }
+
     private ObservableList<InterviewDATA> addlist_InterviewList;
+
     public void ShowList_InterviewViewData() throws SQLException {
         addlist_InterviewList = list_InterviewData();
         loadInterviewData();
         Interview_table.setItems(addlist_InterviewList);
 
     }
+
     private void createScheduledInterview(int memberID, int jobOpeningID) {
         try {
             connect = SQLServerConnection.startConnection();
@@ -542,23 +640,24 @@ public void fillVbox_interset()
         List<Pair<Integer, String>> employerInfolist = new ArrayList<>();
         String query = "SELECT ID as EmployerID, Name\n" +
                 "FROM EmployerView\n" +
-                "WHERE Company_ID = " + companyID ;
+                "WHERE Company_ID = " + companyID;
 
-        ResultSet result =  SQLServerConnection.DoQuery(query,Select);
+        ResultSet result = SQLServerConnection.DoQuery(query, Select);
 
 
-            while (result.next()) {
-                int employerID = result.getInt("EmployerID");
-                String employerName = result.getString("Name");
-                Pair<Integer, String> employerInfo = new Pair<>(employerID, employerName);
-                employerInfolist.add(employerInfo);
-            }
+        while (result.next()) {
+            int employerID = result.getInt("EmployerID");
+            String employerName = result.getString("Name");
+            Pair<Integer, String> employerInfo = new Pair<>(employerID, employerName);
+            employerInfolist.add(employerInfo);
+        }
 
         result.close();
 
 
         return employerInfolist;
     }
+
     private String[] getEmployerNames(int companyID) throws SQLException {
         List<Pair<Integer, String>> employerInfoList = getEmployerInfo(companyID);
         String[] employerNames = new String[employerInfoList.size()];
@@ -570,6 +669,7 @@ public void fillVbox_interset()
 
         return employerNames;
     }
+
     @FXML
     public int SelectInterview() throws SQLException {
         InterviewDATA InterviewD = Interview_table.getSelectionModel().getSelectedItem();
@@ -581,11 +681,12 @@ public void fillVbox_interset()
 
         Interviewer_combobox.setValue(InterviewD.getInterviewer());
         InterviewStatus_combobox.setValue(InterviewD.getInterviewStatus());
-       InterviewType_combobox.setValue(InterviewD.getInterviewType());
-       Interview_date.setValue(InterviewD.getDate().toLocalDate());
+        InterviewType_combobox.setValue(InterviewD.getInterviewType());
+        Interview_date.setValue(InterviewD.getDate().toLocalDate());
         return num;
 
     }
+
     private void updateInterview() throws SQLException {
         int InterviewerID = 0;
         String query = "UPDATE Interview\n" +
@@ -607,24 +708,22 @@ public void fillVbox_interset()
         int companyID = UserData.COMPANYID;
 
 
-            Connection connection = SQLServerConnection.startConnection();
-            PreparedStatement statement = connection.prepareStatement(query2);
-            statement.setString(1, selectedInterviewer);
-            statement.setInt(2, companyID);
-            ResultSet result = statement.executeQuery();
+        Connection connection = SQLServerConnection.startConnection();
+        PreparedStatement statement = connection.prepareStatement(query2);
+        statement.setString(1, selectedInterviewer);
+        statement.setInt(2, companyID);
+        ResultSet result = statement.executeQuery();
 
-            if (result.next()) {
-                InterviewerID = result.getInt("EmployerID");
-            }
+        if (result.next()) {
+            InterviewerID = result.getInt("EmployerID");
+        }
 
-            result.close();
-            statement.close();
-
+        result.close();
+        statement.close();
 
 
         TableColumn<InterviewDATA, ?> IntervieweeIDcolumn = Interview_table.getColumns().get(7);
         TableColumn<InterviewDATA, ?> JobIDcolumn = Interview_table.getColumns().get(0);
-
 
 
         InterviewDATA selectedItem = Interview_table.getSelectionModel().getSelectedItem();
@@ -636,11 +735,11 @@ public void fillVbox_interset()
         try {
             Connection connect = SQLServerConnection.startConnection();
             PreparedStatement stat = connect.prepareStatement(query);
-            stat.setInt(1,  InterviewerID);
-            stat.setString(2,  InterviewStatus_combobox.getSelectionModel().getSelectedItem());
+            stat.setInt(1, InterviewerID);
+            stat.setString(2, InterviewStatus_combobox.getSelectionModel().getSelectedItem());
             stat.setString(3, InterviewType_combobox.getSelectionModel().getSelectedItem());
-            stat.setDate(4,java.sql.Date.valueOf(Interview_date.getValue()));
-           stat.setInt(5, JobIDselected);
+            stat.setDate(4, java.sql.Date.valueOf(Interview_date.getValue()));
+            stat.setInt(5, JobIDselected);
             stat.setInt(6, IntervieweeIDselected);
             stat.executeUpdate();
             stat.close();
@@ -669,17 +768,12 @@ public void fillVbox_interset()
     }
 
 
-
-private void emptyInterviewFields()
-{
-    Interviewer_combobox.setValue("");
-    InterviewStatus_combobox.setValue("");
-    InterviewType_combobox.setValue("");
-    Interview_date.setValue(null);
-}
-
-
-
+    private void emptyInterviewFields() {
+        Interviewer_combobox.setValue("");
+        InterviewStatus_combobox.setValue("");
+        InterviewType_combobox.setValue("");
+        Interview_date.setValue(null);
+    }
 
 
     //application form functions
@@ -699,6 +793,7 @@ private void emptyInterviewFields()
             column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
         }
     }
+
     public ObservableList<ApplicationsViewDATA> list_ApplicationsViewData() throws SQLException {
         ObservableList<ApplicationsViewDATA> listData = FXCollections.observableArrayList();
         String query = "SELECT DISTINCT\n" +
@@ -713,10 +808,14 @@ private void emptyInterviewFields()
                 "    A.Application_Status\n" +
                 "FROM\n" +
                 "    Member M\n" +
-                "     JOIN Application A ON M.ID = A.ID\n" +
-                "     JOIN JobOpening J ON A.Job_Opening_ID = J.Job_Opening_ID\n" +
-                "    LEFT JOIN Company C ON M.Company_ID = C.Company_ID;\n" +
-                "   ";
+                "    JOIN Application A ON M.ID = A.ID\n" +
+                "    JOIN JobOpening J ON A.Job_Opening_ID = J.Job_Opening_ID\n" +
+                "    LEFT JOIN Company C ON M.Company_ID = C.Company_ID\n" +
+                "WHERE\n" +
+                "    C.Company_ID = " + UserData.COMPANYID;
+
+
+
         connect = SQLServerConnection.startConnection();
         try {
             prepare = connect.prepareStatement(query);
@@ -741,15 +840,18 @@ private void emptyInterviewFields()
         }
         return listData;
     }
+
     private ObservableList<ApplicationsViewDATA> addlist_ApplicationsViewList;
+
     public void ShowList_ApplicationsViewData() throws SQLException {
         addlist_ApplicationsViewList = list_ApplicationsViewData();
         loadApplicationsData();
         applications_table.setItems(addlist_ApplicationsViewList);
 
     }
+
     @FXML
-    public  Pair<Integer, Integer> ApplictionsViewSelect() throws SQLException {
+    public Pair<Integer, Integer> ApplictionsViewSelect() throws SQLException {
 
         ApplicationsViewDATA ApplicationsViewD = applications_table.getSelectionModel().getSelectedItem();
         int num = applications_table.getSelectionModel().getSelectedIndex();
@@ -757,7 +859,7 @@ private void emptyInterviewFields()
         if ((num - 1) < -1) {
             return new Pair<>(num, num);
         }
-    //    app_Status_combobox.setValue(ApplicationsViewD.getApplicationStatus());
+        //    app_Status_combobox.setValue(ApplicationsViewD.getApplicationStatus());
         TableColumn<ApplicationsViewDATA, Integer> firstColumn = (TableColumn<ApplicationsViewDATA, Integer>) applications_table.getColumns().get(0);
         TableColumn<ApplicationsViewDATA, Integer> secondColumn = (TableColumn<ApplicationsViewDATA, Integer>) applications_table.getColumns().get(1);
 
@@ -789,7 +891,7 @@ private void emptyInterviewFields()
         try {
             connect = SQLServerConnection.startConnection();
             PreparedStatement statement = connect.prepareStatement(query);
-            statement.setString(1,ApplicationStatus);
+            statement.setString(1, ApplicationStatus);
 
             statement.setInt(2, memberID);
             statement.setInt(3, jobOpeningID);
@@ -811,9 +913,9 @@ private void emptyInterviewFields()
         // Get the selected applicant ID from the application table
         ApplicationsViewDATA selectedApplicant = applications_table.getSelectionModel().getSelectedItem();
 
-        if(selectedApplicant!=null) {
+        if (selectedApplicant != null) {
             int applicantID = selectedApplicant.getMemberId();
-        //    System.out.println(applicantID);
+            //    System.out.println(applicantID);
 
             try {
 
@@ -835,19 +937,15 @@ private void emptyInterviewFields()
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No Applicant is selected");
-
-
 
 
     }
 
 
-
     public void updateSelectedApplication() throws SQLException {
-            connect = SQLServerConnection.startConnection();
+        connect = SQLServerConnection.startConnection();
 
         ApplicationsViewDATA selectedItem = applications_table.getSelectionModel().getSelectedItem();
 
@@ -861,13 +959,24 @@ private void emptyInterviewFields()
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
 
     }
-
-
-
-
-
-
-
+    @FXML
+    private void displayResume(ImageView imageView, int jobOpeningID) {
+        String query = "SELECT Resume FROM Application WHERE Job_Opening_ID = ?";
+        try (Connection connection = SQLServerConnection.startConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, 33);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                byte[] resumeBytes = resultSet.getBytes("Resume");
+                Image resumeImage = new Image(new ByteArrayInputStream(resumeBytes));
+                imageView.setImage(resumeImage);
+            } else {
+                System.out.println("Resume not found for the selected job opening ID.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     //..............................................................................
@@ -887,7 +996,7 @@ private void emptyInterviewFields()
         }
     }
 
-    private int SelectedEmployeeID(){
+    private int SelectedEmployeeID() {
         int num = emp_table.getSelectionModel().getSelectedIndex();
 
         if ((num - 1) < -1) {
@@ -924,7 +1033,7 @@ private void emptyInterviewFields()
         String Usertype = null;
         while (resultSet.next()) {
             salary = String.valueOf(resultSet.getInt("Salary"));
-            Usertype =  resultSet.getString("User_Type");
+            Usertype = resultSet.getString("User_Type");
         }
 
         user_type_combobox.setValue(Usertype);
@@ -949,8 +1058,9 @@ private void emptyInterviewFields()
             column.setCellValueFactory(new PropertyValueFactory<>(columnMappings.get(column)));
         }
     }
-    public int JobOpeningSelect() {
 
+    public int JobOpeningSelect() {
+        // Existing code to retrieve the selected job opening
         JobOpeningsDATA jobOpeningD = opening_table.getSelectionModel().getSelectedItem();
         int num = opening_table.getSelectionModel().getSelectedIndex();
 
@@ -966,12 +1076,41 @@ private void emptyInterviewFields()
 
         opening_job_type_combobox.setValue(jobOpeningD.getJobType());
         TableColumn<JobOpeningsDATA, Integer> firstColumn = (TableColumn<JobOpeningsDATA, Integer>) opening_table.getColumns().get(0);
-        int JobOpeningID = firstColumn.getCellData(num);
+        int jobOpeningID = firstColumn.getCellData(num);
 
-        return JobOpeningID;
+        for (Node node : Vbox_intersets.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                checkBox.setSelected(false);
+            }
+        }
 
+        // Retrieve the interests associated with the selected job opening
+        try {
+            List<String> interestNames = getInterestsNames(jobOpeningID);
+
+            // Check the checkboxes for the interests associated with the selected job opening
+            for (Node node : Vbox_intersets.getChildren()) {
+                int i=0;
+                if (node instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) node;
+                    String interestName = checkBox.getText();
+
+
+
+                    if (interestNames.contains(interestName)) {
+                        checkBox.setSelected(true);
+                    }
+                }
+                i++;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return jobOpeningID;
     }
-
 
 
 
@@ -984,38 +1123,37 @@ private void emptyInterviewFields()
     }
 
     private boolean AlertCheckFields() {
-            if (opening_job_title_tf.getText().isEmpty()
-                    || opening_date_date.getValue() == null
-                    || opening_job_description_ta.getText().isEmpty()
-                    || opening_salary_tf.getText().isEmpty()
-                    || opening_job_type_combobox.getSelectionModel().isEmpty())
-            {
-                return false;
-            }
-             return true;
+        if (opening_job_title_tf.getText().isEmpty()
+                || opening_date_date.getValue() == null
+                || opening_job_description_ta.getText().isEmpty()
+                || opening_salary_tf.getText().isEmpty()
+                || opening_job_type_combobox.getSelectionModel().isEmpty()) {
+            return false;
+        }
+        return true;
 
     }
 
     private boolean AlertCheckFieldsEmployee() {
         if (salary_tf.getText().isEmpty()
                 || position_tf.getText().isEmpty()
-                || user_type_combobox.getSelectionModel().isEmpty())
-        {
+                || user_type_combobox.getSelectionModel().isEmpty()) {
             return false;
         }
         return true;
 
     }
+
     private void updateEmployee() {
         String query = "UPDATE Member SET User_Type = ?, Postion = ?,Salary = ? WHERE ID = ?";
 
         try {
             Connection connection = SQLServerConnection.startConnection();
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1,  (String)user_type_combobox.getSelectionModel().getSelectedItem());
+            statement.setString(1, (String) user_type_combobox.getSelectionModel().getSelectedItem());
             statement.setString(2, position_tf.getText());
             statement.setString(3, salary_tf.getText());
-            statement.setInt(4,SelectedEmployeeID());
+            statement.setInt(4, SelectedEmployeeID());
             statement.executeUpdate();
             statement.close();
             connection.close();
@@ -1024,10 +1162,12 @@ private void emptyInterviewFields()
             throw new RuntimeException(e);
         }
     }
-    public void insertJobOpening(int companyId, String jobTitle, String jobDescription, String jobType, String salary, LocalDate deadline) {
-        String query = "INSERT INTO JobOpening (Company_ID, Job_Tilte, Job_Description, Job_Type, Salary, Deadline) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement statement = connect.prepareStatement(query)) {
+    public int insertJobOpening(int companyId, String jobTitle, String jobDescription, String jobType, String salary, LocalDate deadline) {
+        String query = "INSERT INTO JobOpening (Company_ID, Job_Tilte, Job_Description, Job_Type, Salary, Deadline) VALUES (?, ?, ?, ?, ?, ?)";
+        int generatedID = -1;
+
+        try (PreparedStatement statement = connect.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, companyId);
             statement.setString(2, jobTitle);
             statement.setString(3, jobDescription);
@@ -1035,45 +1175,64 @@ private void emptyInterviewFields()
             statement.setString(5, salary);
             statement.setDate(6, java.sql.Date.valueOf(deadline));
             statement.executeUpdate();
+
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                generatedID = generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        return generatedID;
     }
+
+
     @FXML
     public void deleteJobOpening() {
-        int JobOpeningID = JobOpeningSelect();
-        String query = "DELETE FROM JobOpening Where Job_Opening_ID = " + JobOpeningID;
-        try {
-            SQLServerConnection.DoQuery(query,'D');
-            ShowList_JobOpeningData();
-            showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Job Opening Have Been Deleted!");
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-    private void updateJobOpening() {
-        String query = "UPDATE JobOpening SET Job_Tilte = ?," +
-                " Job_Description = ?, Job_Type = ?, Salary = ?," +
-                " Deadline = ? WHERE Job_Opening_ID = ?";
-
+        int jobOpeningID = SelectedJobOpening();
+        String deleteJobOpeningIntersetQuery = "DELETE FROM JobOpeningInterset WHERE Job_Opening_ID = ?";
         try {
             Connection connection = SQLServerConnection.startConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1,  opening_job_title_tf.getText());
-            statement.setString(2, opening_job_description_ta.getText());
-            statement.setString(3, (String)opening_job_type_combobox.getSelectionModel().getSelectedItem());
-            statement.setInt(4, Integer.parseInt(opening_salary_tf.getText()));
-            statement.setDate(5, java.sql.Date.valueOf(opening_date_date.getValue()));
-            statement.setInt(6, JobOpeningSelect());
+            PreparedStatement statement = connection.prepareStatement(deleteJobOpeningIntersetQuery);
+            statement.setInt(1, jobOpeningID);
             statement.executeUpdate();
             statement.close();
             connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        String jobOpeningQuery = "DELETE FROM JobOpening WHERE Job_Opening_ID = " + jobOpeningID;
+        try {
+            SQLServerConnection.DoQuery(jobOpeningQuery, Delete);
+            ShowList_JobOpeningData();
+            ResetFields_JobOpeing();
+            showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Job Opening has been deleted!");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+
+    private void updateJobOpening() throws SQLException {
+        String query = "UPDATE JobOpening SET Job_Tilte = ?," +
+                " Job_Description = ?, Job_Type = ?, Salary = ?," +
+                " Deadline = ? WHERE Job_Opening_ID = ?";
+            Connection connection = SQLServerConnection.startConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, opening_job_title_tf.getText());
+            statement.setString(2, opening_job_description_ta.getText());
+            statement.setString(3, (String) opening_job_type_combobox.getSelectionModel().getSelectedItem());
+            statement.setInt(4, Integer.parseInt(opening_salary_tf.getText()));
+            statement.setDate(5, java.sql.Date.valueOf(opening_date_date.getValue()));
+            statement.setInt(6, SelectedJobOpening());
+            statement.executeUpdate();
+            statement.close();
+            connection.close();
+        MapJobOpeningsIntersets(SelectedJobOpening());
+
+    }
+
     public void updateSelectedEmployee() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -1085,7 +1244,7 @@ private void emptyInterviewFields()
 
         if (selectedItem != null) {
             try {
-                if (AlertCheckFieldsEmployee()){
+                if (AlertCheckFieldsEmployee()) {
                     showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Successfully Updated!");
                     updateEmployee();
                     ShowList_EmployeeData();
@@ -1100,31 +1259,30 @@ private void emptyInterviewFields()
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
         }
     }
-    public void uploadImageToDatabase(String imagePath, int applicationID) {
+
+    public void uploadImageToDatabase(String imagePath, int applicationID, int JobOpeningID) {
         try {
-            // Read the image file into bytes
             File imageFile = new File(imagePath);
-            byte[] imageData = Files.readAllBytes(imageFile.toPath());
+            FileInputStream fileInputStream = new FileInputStream(imageFile);
 
-            // Prepare the SQL query with parameters for the image data and application ID
-            String query = "UPDATE Application SET Resume = ? WHERE ID = ?";
-
-            // Create a connection to the database
+            String insertQuery = "INSERT INTO Application (ID, Job_Opening_ID, Resume, Application_Status, Sent_Date) " +
+                    "VALUES (?, ?, ?, ?, ?)";
             Connection connection = SQLServerConnection.startConnection();
+            PreparedStatement statement = connection.prepareStatement(insertQuery);
 
-            // Create a prepared statement with the query
-            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, applicationID);
+            statement.setInt(2, JobOpeningID);
+            statement.setBinaryStream(3, fileInputStream, imageFile.length());
+            statement.setString(4, "Pending");
+            statement.setDate(5, java.sql.Date.valueOf(LocalDate.now()));
 
-            // Set the parameter for the image data
-            statement.setBytes(1, imageData);
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Resume inserted successfully.");
+            } else {
+                System.out.println("Failed to insert resume.");
+            }
 
-            // Set the parameter for the application ID
-            statement.setInt(2, applicationID);
-
-            // Execute the query to update the image
-            statement.executeUpdate();
-
-            // Close the statement and connection
             statement.close();
             connection.close();
 
@@ -1133,6 +1291,7 @@ private void emptyInterviewFields()
             e.printStackTrace();
         }
     }
+
     public void ADD_JobOpening() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -1142,9 +1301,11 @@ private void emptyInterviewFields()
 
         try {
             if (AlertCheckFields()) {
-                insertJobOpening(1, opening_job_title_tf.getText(), opening_job_description_ta.getText(),
-                        (String)opening_job_type_combobox.getSelectionModel().getSelectedItem(),
+                // Insert the job opening
+                int jobOpeningID = insertJobOpening(UserData.COMPANYID, opening_job_title_tf.getText(), opening_job_description_ta.getText(),
+                        (String) opening_job_type_combobox.getSelectionModel().getSelectedItem(),
                         opening_salary_tf.getText(), opening_date_date.getValue());
+                MapJobOpeningsIntersets(jobOpeningID);
 
                 showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Successfully Added!");
 
@@ -1157,6 +1318,7 @@ private void emptyInterviewFields()
             e.printStackTrace();
         }
     }
+
     public void updateSelectedJobOpening() {
         try {
             connect = SQLServerConnection.startConnection();
@@ -1183,7 +1345,15 @@ private void emptyInterviewFields()
             showAlert(Alert.AlertType.ERROR, "Error Message", null, "No item selected");
         }
     }
+
     public void ResetFields_JobOpeing() {
+        ObservableList<Node> children = Vbox_intersets.getChildren();
+        for (Node node : children) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                checkBox.setSelected(false);
+            }
+        }
         opening_job_title_tf.setText("");
         opening_salary_tf.setText("");
         opening_job_description_ta.setText("");
@@ -1192,6 +1362,7 @@ private void emptyInterviewFields()
 
 
     }
+
     public void ResetFields_Employee() {
         String orignalvalue = "select employee";
         String Orignalvalue2 = "empty";
@@ -1203,21 +1374,32 @@ private void emptyInterviewFields()
         position_tf.setText("");
         salary_tf.setText("");
     }
+    private void loadImage(ImageView imageView, String imagePath) {
+        try {
+            Image image = new Image("file:" + imagePath);
+            imageView.setImage(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             populateComboBox(opening_job_type_combobox, JobTypesList);
             populateComboBox(user_type_combobox, UserTypeList);
-            populateComboBox(app_Status_combobox,ApplicationStatusList);
-            populateComboBox(InterviewStatus_combobox,InterviewStatusList);
-            populateComboBox(InterviewType_combobox,InterviewTypeList);
-            populateComboBox(Interviewer_combobox,getEmployerNames(UserData.COMPANYID));
+            populateComboBox(app_Status_combobox, ApplicationStatusList);
+            populateComboBox(InterviewStatus_combobox, InterviewStatusList);
+            populateComboBox(InterviewType_combobox, InterviewTypeList);
+            populateComboBox(Interviewer_combobox, getEmployerNames(UserData.COMPANYID));
             fillVbox_interset();
             ShowList_JobOpeningData();
             ShowList_EmployeeData();
             ShowList_ApplicationsViewData();
             ShowList_InterviewViewData();
+            String imagePath = "E:\\Media\\resume andrew.PNG";
+
+           // uploadImageToDatabase(imagePath,1,33);
 
 
 
@@ -1226,7 +1408,6 @@ private void emptyInterviewFields()
         }
         loadJobOpeningsData();
     }
-
 
 
 }

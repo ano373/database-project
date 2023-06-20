@@ -5,7 +5,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -34,7 +33,7 @@ public class ApplicantDetailsController implements Initializable {
     private Label profile_fn_label;
     @FXML
     private Label profile_ln_label;
-    HelloController HE;
+    CompanyFormController HE;
 
     public void setApplicantID(int applicantID) throws SQLException {
 

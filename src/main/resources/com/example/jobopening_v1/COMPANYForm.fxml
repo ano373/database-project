@@ -18,7 +18,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.jobopening_v1.HelloController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.jobopening_v1.CompanyFormController">
    <children>
       <BorderPane stylesheets="@companydashboarddesign.css">
          <top>
@@ -99,7 +99,7 @@
          <center>
             <AnchorPane fx:id="centerpanel" prefHeight="583.0" prefWidth="884.0" BorderPane.alignment="CENTER">
                <children>
-                  <AnchorPane fx:id="jobopening_form" layoutY="283.0">
+                  <AnchorPane fx:id="jobopening_form" layoutY="283.0" visible="false">
                      <children>
                         <AnchorPane layoutX="1.0" layoutY="-282.0" prefHeight="563.0" prefWidth="873.0" stylesheets="@companydashboarddesign.css">
                            <children>
@@ -202,7 +202,7 @@
                         </AnchorPane>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="applications_form" prefHeight="564.8" prefWidth="884.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="applications_form" prefHeight="564.8" prefWidth="884.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <TableView fx:id="applications_table" layoutX="4.0" layoutY="9.0" onMouseClicked="#ApplictionsViewSelect" prefHeight="378.0" prefWidth="870.0">
                           <columns>
@@ -233,7 +233,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="app_ViewProfile_Btn" layoutX="98.0" layoutY="51.0" mnemonicParsing="false" onAction="#openApplicantDetails" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
+                              <Button fx:id="app_ViewProfile_Btn" layoutX="517.0" layoutY="101.0" mnemonicParsing="false" onAction="#openApplicantDetails" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -253,6 +253,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
+                              <ImageView fx:id="imageview_pan" fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
                            </children>
                         </AnchorPane>
                      </children>
