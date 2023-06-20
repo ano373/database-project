@@ -49,7 +49,6 @@
          <left>
             <AnchorPane fx:id="sidepanel" prefHeight="565.0" prefWidth="214.0" styleClass="nav-form-aqua-blue" stylesheets="@companydashboarddesign.css" BorderPane.alignment="CENTER">
                <children>
-                  <FontAwesomeIcon glyphName="USER" layoutX="70.0" layoutY="153.0" size="7EM" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="166.0" prefHeight="18.0" prefWidth="214.0" text="Welcome" />
                   <Line endX="84.99998474121094" layoutX="107.0" layoutY="206.0" startX="-76.59999084472656" />
                   <Button fx:id="home_btn" alignment="CENTER_RIGHT" layoutX="30.0" layoutY="218.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="30.0" prefWidth="161.0" styleClass="nav-btn" stylesheets="@companydashboarddesign.css" text="    Home" textOverrun="CLIP">
@@ -92,7 +91,7 @@
                      </graphic>
                   </Button>
                   <Label layoutX="83.0" layoutY="521.0" text="Sign Out" />
-                  <Label fx:id="company_name_label" layoutX="86.0" layoutY="184.0" prefHeight="18.0" prefWidth="50.0" text="label" />
+                  <FontAwesomeIcon glyphName="USER" layoutX="62.0" layoutY="143.0" size="8em" wrappingWidth="87.02858543395996" />
                </children>
             </AnchorPane>
          </left>
@@ -243,7 +242,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="app_ViewResume_Btn" layoutX="316.0" layoutY="51.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="162.0" text="View Applicant Resume">
+                              <Button fx:id="app_ViewResume_Btn" layoutX="316.0" layoutY="51.0" mnemonicParsing="false" onAction="#ViewResume" prefHeight="50.0" prefWidth="162.0" text="View Applicant Resume">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />

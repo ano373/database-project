@@ -92,15 +92,6 @@ public class SQLServerConnection {
     }
 
 
-    public static void closeConnection() {
-        try {
-            if (connection != null) {
-                connection.close();
-                System.out.println("Connection closed.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error while closing the connection: " + e.getMessage());
-        }
-    }
+
 }
 

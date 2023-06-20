@@ -1,4 +1,6 @@
 package com.example.jobopening_v1;
+
+import com.example.jobopening_v1.SQLServerConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,13 +11,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-
-
 
 public class SignINController {
     @FXML
@@ -39,6 +39,51 @@ public class SignINController {
 
     private double x = 0;
     private double y = 0;
+
+
+
+    public void company_creation() throws IOException {
+        loginbtn.getScene().getWindow().hide();
+        Parent root = FXMLLoader.load(getClass().getResource("Company_Creation.fxml"));
+        Stage stage = new Stage();
+        Scene scene = new Scene(root);
+        root.setOnMousePressed((MouseEvent event) ->{
+            x = event.getSceneX();
+            y = event.getSceneY();
+        });
+
+        root.setOnMouseDragged((MouseEvent event) ->{
+            stage.setX(event.getScreenX() - x);
+            stage.setY(event.getScreenY() - y);
+        });
+
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+
+        stage.setScene(scene);
+        stage.show();
+    }
+    public void signup() throws IOException {
+        loginbtn.getScene().getWindow().hide();
+        Parent root = FXMLLoader.load(getClass().getResource("Signup_form.fxml"));
+        Stage stage = new Stage();
+        Scene scene = new Scene(root);
+        root.setOnMousePressed((MouseEvent event) ->{
+            x = event.getSceneX();
+            y = event.getSceneY();
+        });
+
+        root.setOnMouseDragged((MouseEvent event) ->{
+            stage.setX(event.getScreenX() - x);
+            stage.setY(event.getScreenY() - y);
+        });
+
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+
+        stage.setScene(scene);
+        stage.show();
+    }
     public void login() throws SQLException {
         String sql = "SELECT * FROM Member WHERE Email = ? AND Password = ?";
         conn = SQLServerConnection.startConnection();
@@ -65,7 +110,7 @@ public class SignINController {
                     UserData.email = rs.getString("Email");
                     UserData.COMPANYID = rs.getInt("Company_ID");
 
-                    // Determine the FXML file based on the user type
+
                     String fxmlFile = null;
                     if (User_Type.equals("Employer")) {
                         fxmlFile = "COMPANYForm.fxml";
@@ -73,7 +118,7 @@ public class SignINController {
                         fxmlFile = "EmployeeForm.fxml";
                     }
 
-                    // Check if fxmlFile is not null before loading the FXML file
+
                     if (fxmlFile != null) {
                         alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("info");
@@ -99,7 +144,6 @@ public class SignINController {
                         stage.setScene(scene);
                         stage.show();
                     } else {
-                        // Handle the case when fxmlFile is null
                         alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error Message");
                         alert.setHeaderText(null);
@@ -118,9 +162,13 @@ public class SignINController {
             ex.printStackTrace();
         }
     }
-
-
-    public void close(){
+    public void close() {
         System.exit(0);
     }
+
 }
+
+
+
+
+

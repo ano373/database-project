@@ -243,6 +243,8 @@ public class CompanyFormController implements Initializable {
     @FXML
     private Button signout_btn;
 
+    @FXML
+    private ImageView Logo_ImageView;
 
     JobOpeningsDATA JobOpeningsList;
 
@@ -291,6 +293,7 @@ public class CompanyFormController implements Initializable {
 
         }
     }
+
 
     public void logout() {
 
@@ -355,6 +358,35 @@ public class CompanyFormController implements Initializable {
             Vbox_intersets.getChildren().add(checkBox);
         }
     }
+
+//    void retrieveLogoFromDatabase() {
+//        try {
+//            Connection connect = SQLServerConnection.startConnection();
+//            String query = "SELECT Logo " +
+//                    "FROM Company " +
+//                    "WHERE Company_ID = " +UserData.COMPANYID;
+//
+//            ResultSet result =  SQLServerConnection.DoQuery(query,'S');
+//
+//
+//            byte[] imageData = null;
+//            if (result.next()) {
+//                imageData = result.getBytes("Logo");
+//            }
+//            result.close();
+//            connect.close();
+//
+//            if (imageData != null) {
+//                Image image = new Image(new ByteArrayInputStream(imageData));
+//                Logo_ImageView.setImage(image);
+//            }
+//
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
 
     private List<String> getInterestsFromDatabase() {
@@ -440,8 +472,6 @@ public class CompanyFormController implements Initializable {
         TableColumn<JobOpeningsDATA, Integer> firstColumn = (TableColumn<JobOpeningsDATA, Integer>) opening_table.getColumns().get(0);
         JobOpeningID = firstColumn.getCellData(num);
         return JobOpeningID;
-
-
     }
 
     private int intersetIDsByName(String IntersetName) throws SQLException {
@@ -629,6 +659,7 @@ public class CompanyFormController implements Initializable {
             insertStatement.close();
 
             connect.close();
+            ShowList_InterviewViewData();
 
 
         } catch (SQLException e) {
@@ -812,7 +843,9 @@ public class CompanyFormController implements Initializable {
                 "    JOIN JobOpening J ON A.Job_Opening_ID = J.Job_Opening_ID\n" +
                 "    LEFT JOIN Company C ON M.Company_ID = C.Company_ID\n" +
                 "WHERE\n" +
-                "    C.Company_ID = " + UserData.COMPANYID;
+                "    C.Company_ID = " + UserData.COMPANYID +
+                " AND A.Application_Status = 'Pending'";
+
 
 
 
@@ -875,6 +908,37 @@ public class CompanyFormController implements Initializable {
         System.out.println("Job Opening ID: " + jobOpeningID);
         return new Pair<>(MemberID, jobOpeningID);
     }
+    @FXML
+    private void ViewResume() throws SQLException {
+        Pair<Integer, Integer> selectedIds = ApplictionsViewSelect();
+        int jobOpeningID = selectedIds.getValue();
+
+        ApplicationsViewDATA selectedApplicant = applications_table.getSelectionModel().getSelectedItem();
+
+        if (selectedApplicant != null) {
+            int applicantID = selectedApplicant.getMemberId();
+
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("ResumeViewForm.fxml"));
+                Parent root = loader.load();
+
+                ResumeViewController resumeViewController = loader.getController();
+                resumeViewController.retrieveImageDataFromDatabase(applicantID, jobOpeningID);
+
+                Stage detailsStage = new Stage();
+                detailsStage.setScene(new Scene(root));
+                detailsStage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error Message", null, "No Applicant is selected");
+        }
+    }
+
+
+
+
 
     private void updateApplicationStatus() {
         Pair<Integer, Integer> resultPair = null;
@@ -1191,20 +1255,32 @@ public class CompanyFormController implements Initializable {
     @FXML
     public void deleteJobOpening() {
         int jobOpeningID = SelectedJobOpening();
-        String deleteJobOpeningIntersetQuery = "DELETE FROM JobOpeningInterset WHERE Job_Opening_ID = ?";
+
         try {
             Connection connection = SQLServerConnection.startConnection();
-            PreparedStatement statement = connection.prepareStatement(deleteJobOpeningIntersetQuery);
-            statement.setInt(1, jobOpeningID);
-            statement.executeUpdate();
-            statement.close();
+
+            String deleteInterviewsQuery = "DELETE FROM Interview WHERE Job_Opening_ID = ?";
+            PreparedStatement deleteInterviewsStatement = connection.prepareStatement(deleteInterviewsQuery);
+            deleteInterviewsStatement.setInt(1, jobOpeningID);
+            deleteInterviewsStatement.executeUpdate();
+            deleteInterviewsStatement.close();
+
+            // Delete applications associated with the job opening
+            String deleteApplicationsQuery = "DELETE FROM Application WHERE Job_Opening_ID = ?";
+            PreparedStatement deleteApplicationsStatement = connection.prepareStatement(deleteApplicationsQuery);
+            deleteApplicationsStatement.setInt(1, jobOpeningID);
+            deleteApplicationsStatement.executeUpdate();
+            deleteApplicationsStatement.close();
+
+            // Delete the job opening
+            String deleteJobOpeningQuery = "DELETE FROM JobOpening WHERE Job_Opening_ID = ?";
+            PreparedStatement deleteJobOpeningStatement = connection.prepareStatement(deleteJobOpeningQuery);
+            deleteJobOpeningStatement.setInt(1, jobOpeningID);
+            deleteJobOpeningStatement.executeUpdate();
+            deleteJobOpeningStatement.close();
+
             connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        String jobOpeningQuery = "DELETE FROM JobOpening WHERE Job_Opening_ID = " + jobOpeningID;
-        try {
-            SQLServerConnection.DoQuery(jobOpeningQuery, Delete);
+
             ShowList_JobOpeningData();
             ResetFields_JobOpeing();
             showAlert(Alert.AlertType.INFORMATION, "Information Message", null, "Job Opening has been deleted!");
@@ -1212,6 +1288,7 @@ public class CompanyFormController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
 
 
     private void updateJobOpening() throws SQLException {

@@ -5,15 +5,21 @@ package com.example.jobopening_v1;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +91,9 @@ public class SignupFormController {
     private Button Submit_btn;
 
     @FXML
+    private Button Goback_btn;
+
+    @FXML
     private ComboBox<?> Type_selection;
 
     @FXML
@@ -95,6 +104,9 @@ public class SignupFormController {
 
     @FXML
     private ComboBox<?> interst3;
+
+    private double x = 0;
+    private double y = 0;
 
 // database connections
 
@@ -560,4 +572,27 @@ public class SignupFormController {
         clearfields();
 
     }
+    public void returntologin() throws IOException {
+        Goback_btn.getScene().getWindow().hide();
+        Parent root = FXMLLoader.load(getClass().getResource("SignIN.fxml"));
+        Stage stage = new Stage();
+        Scene scene = new Scene(root);
+        root.setOnMousePressed((MouseEvent event) ->{
+            x = event.getSceneX();
+            y = event.getSceneY();
+        });
+
+        root.setOnMouseDragged((MouseEvent event) ->{
+            stage.setX(event.getScreenX() - x);
+            stage.setY(event.getScreenY() - y);
+        });
+        UserData.path3="";
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+
+        stage.setScene(scene);
+        stage.show();
+    }
+
+
 }
