@@ -233,7 +233,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="app_ViewProfile_Btn" layoutX="517.0" layoutY="101.0" mnemonicParsing="false" onAction="#openApplicantDetails" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
+                              <Button fx:id="app_ViewProfile_Btn" layoutX="94.0" layoutY="51.0" mnemonicParsing="false" onAction="#openApplicantDetails" prefHeight="50.0" prefWidth="166.0" text="View Applicant Profile">
                                  <styleClass>
                                     <String fx:value="nav-form-aqua-blue" />
                                     <String fx:value="logout" />
@@ -253,7 +253,6 @@
                                     <Font size="13.0" />
                                  </font>
                               </Button>
-                              <ImageView fx:id="imageview_pan" fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
                            </children>
                         </AnchorPane>
                      </children>
